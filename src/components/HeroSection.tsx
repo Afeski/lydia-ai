@@ -10,8 +10,7 @@ const HeroSection = () => {
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
           <div className="w-full lg:w-1/2 stagger-animation">
-            <div className="hero-chip mb-4">AI-Powered Health Assistant</div>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-lydia-navy mb-6 leading-tight">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#301A4B] mb-6 leading-tight">
               Lydia: Your AI Health Assistant
             </h1>
             <p className="text-lg md:text-xl text-gray-700 mb-8 max-w-lg">
@@ -19,11 +18,11 @@ const HeroSection = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4">
-              <a href="#" className="btn-primary flex items-center justify-center gap-2 group">
+              <a href="/signup" className="bg-[#301A4B] text-white px-6 py-3 rounded-md font-medium transition-all duration-300 hover:bg-[#301A4B]/90 hover:shadow-md flex items-center justify-center gap-2 group">
                 Get Started
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </a>
-              <a href="#how-it-works" className="btn-secondary flex items-center justify-center">
+              <a href="#how-it-works" className="bg-lydia-lavender text-[#301A4B] px-6 py-3 rounded-md font-medium transition-all duration-300 hover:bg-lydia-lavender/80 hover:shadow-md flex items-center justify-center">
                 Watch How It Works
               </a>
             </div>
@@ -31,7 +30,7 @@ const HeroSection = () => {
           
           <div className="w-full lg:w-1/2 animate-fade-in">
             <div className="relative rounded-2xl overflow-hidden shadow-2xl transform transition-all hover:scale-[1.01] duration-500 ease-in-out">
-              <div className="absolute inset-0 bg-gradient-to-tr from-lydia-navy/30 to-transparent z-10 rounded-2xl"></div>
+              <div className="absolute inset-0 bg-gradient-to-tr from-[#301A4B]/30 to-transparent z-10 rounded-2xl"></div>
               <img
                 src="/lovable-uploads/0939a336-cfed-44d2-8108-b7c0d3b9810d.png"
                 alt="A woman having a telemedicine consultation with a doctor"

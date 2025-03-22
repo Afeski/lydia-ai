@@ -1,11 +1,13 @@
 
 import React, { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 const NavigationBar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,23 +22,27 @@ const NavigationBar = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
+  const handleSignUpClick = () => {
+    navigate("/signup");
+  };
+
+  const handleLoginClick = () => {
+    navigate("/login");
+  };
+
   return (
     <header
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
         isScrolled
-          ? "py-3 bg-lydia-purple/90 backdrop-blur-md shadow-sm"
-          : "py-5 bg-lydia-purple"
+          ? "py-3 bg-[#301A4B]/90 backdrop-blur-md shadow-sm"
+          : "py-5 bg-[#301A4B]"
       )}
     >
       <div className="container mx-auto px-4 flex items-center justify-between">
         <div className="flex items-center">
           <a href="#" className="flex items-center">
-            <img
-              src="/lovable-uploads/4b2c189e-531a-4995-8260-3228e9fd26c9.png"
-              alt="Lydia Logo"
-              className="h-10 w-auto object-contain"
-            />
+            <h1 className="text-2xl font-bold text-white">Lydia</h1>
           </a>
         </div>
 
@@ -51,9 +57,15 @@ const NavigationBar = () => {
           <a href="#partnerships" className="animated-link text-white font-medium">
             Partnerships
           </a>
-          <a href="#" className="btn-primary bg-white text-lydia-purple hover:bg-white/90">
-            Sign up/Log In
+          <a href="/login" className="text-white font-medium mr-2 hover:underline" onClick={(e) => { e.preventDefault(); handleLoginClick(); }}>
+            Log In
           </a>
+          <button 
+            onClick={handleSignUpClick}
+            className="flex items-center gap-2 bg-white text-[#301A4B] px-6 py-3 rounded-md font-medium hover:bg-white/90 transition-all duration-300"
+          >
+            Sign Up <ArrowRight size={16} />
+          </button>
         </nav>
 
         {/* Mobile Menu Button */}
@@ -69,7 +81,7 @@ const NavigationBar = () => {
       {/* Mobile Navigation Menu */}
       <div
         className={cn(
-          "fixed inset-0 bg-lydia-purple z-40 flex flex-col pt-24 px-6 transform transition-transform duration-300 ease-in-out md:hidden",
+          "fixed inset-0 bg-[#301A4B] z-40 flex flex-col pt-24 px-6 transform transition-transform duration-300 ease-in-out md:hidden",
           isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
@@ -96,12 +108,18 @@ const NavigationBar = () => {
             Partnerships
           </a>
           <a
-            href="#"
-            className="btn-primary text-center mt-4 bg-white text-lydia-purple hover:bg-white/90"
-            onClick={() => setIsMobileMenuOpen(false)}
+            href="/login"
+            className="text-xl font-medium text-white py-2 border-b border-white/10"
+            onClick={(e) => { e.preventDefault(); handleLoginClick(); setIsMobileMenuOpen(false); }}
           >
-            Sign up/Log In
+            Log In
           </a>
+          <button
+            onClick={() => { handleSignUpClick(); setIsMobileMenuOpen(false); }}
+            className="flex items-center justify-center gap-2 bg-white text-[#301A4B] px-6 py-3 rounded-md font-medium hover:bg-white/90 transition-all mt-4"
+          >
+            Sign Up <ArrowRight size={16} />
+          </button>
         </nav>
       </div>
     </header>

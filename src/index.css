@@ -93,7 +93,7 @@
 @layer components {
   .hero-chip {
     @apply inline-flex items-center rounded-full px-4 py-1 text-xs font-medium 
-           bg-lydia-skyblue/20 text-lydia-navy animate-pulse-soft;
+           bg-lydia-skyblue/20 text-[#301A4B] animate-pulse-soft;
   }
 
   .section-container {
@@ -101,7 +101,7 @@
   }
 
   .section-title {
-    @apply text-3xl sm:text-4xl lg:text-5xl font-bold text-lydia-navy mb-4;
+    @apply text-3xl sm:text-4xl lg:text-5xl font-bold text-[#301A4B] mb-4;
   }
 
   .section-subtitle {
@@ -117,13 +117,13 @@
   }
 
   .btn-primary {
-    @apply px-6 py-3 rounded-md bg-lydia-purple text-white font-medium
-           transition-all duration-300 hover:bg-lydia-purple/90 hover:shadow-md
+    @apply px-6 py-3 rounded-md bg-[#301A4B] text-white font-medium
+           transition-all duration-300 hover:bg-[#301A4B]/90 hover:shadow-md
            focus:outline-none focus:ring-2 focus:ring-lydia-skyblue focus:ring-offset-2;
   }
 
   .btn-secondary {
-    @apply px-6 py-3 rounded-md bg-lydia-lavender text-lydia-navy font-medium
+    @apply px-6 py-3 rounded-md bg-lydia-lavender text-[#301A4B] font-medium
            transition-all duration-300 hover:bg-lydia-lavender/80 hover:shadow-md
            focus:outline-none focus:ring-2 focus:ring-lydia-skyblue focus:ring-offset-2;
   }

@@ -6,16 +6,12 @@ const FooterSection = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-lydia-navy text-white pt-16 pb-8">
+    <footer className="bg-[#301A4B] text-white pt-16 pb-8">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           <div>
             <div className="mb-4">
-              <img
-                src="/lovable-uploads/dec92981-1a88-45bc-8229-830a75e1da92.png"
-                alt="Lydia Logo"
-                className="h-10 w-auto object-contain"
-              />
+              <h2 className="text-2xl font-bold text-white">Lydia</h2>
             </div>
             <p className="text-gray-300 mb-6">
               Transforming healthcare with AI-powered telemedicine solutions that make healthcare more accessible and personalized.
@@ -23,25 +19,25 @@ const FooterSection = () => {
             <div className="flex space-x-4">
               <a
                 href="#"
-                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-lydia-skyblue hover:text-lydia-navy transition-colors duration-300"
+                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-lydia-skyblue hover:text-[#301A4B] transition-colors duration-300"
               >
                 <Instagram size={18} />
               </a>
               <a
                 href="#"
-                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-lydia-skyblue hover:text-lydia-navy transition-colors duration-300"
+                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-lydia-skyblue hover:text-[#301A4B] transition-colors duration-300"
               >
                 <Twitter size={18} />
               </a>
               <a
                 href="#"
-                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-lydia-skyblue hover:text-lydia-navy transition-colors duration-300"
+                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-lydia-skyblue hover:text-[#301A4B] transition-colors duration-300"
               >
                 <Facebook size={18} />
               </a>
               <a
                 href="#"
-                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-lydia-skyblue hover:text-lydia-navy transition-colors duration-300"
+                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-lydia-skyblue hover:text-[#301A4B] transition-colors duration-300"
               >
                 <Linkedin size={18} />
               </a>
