@@ -20,7 +20,7 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				lato: ['Lato', 'sans-serif'],
+				outfit: ['Outfit', 'sans-serif'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',
@@ -62,6 +62,7 @@ export default {
 					navy: '#0A122A',
 					cream: '#F8F1E9',
 					skyblue: '#87CEEB',
+					purple: '#805D93',
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',

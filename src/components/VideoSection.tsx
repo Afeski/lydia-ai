@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { Play, Thermometer, Calendar, Pill } from "lucide-react";
+import { Play, Thermometer, Calendar, Pill, ArrowRight } from "lucide-react";
 
 const VideoSection = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -87,6 +87,13 @@ const VideoSection = () => {
             </div>
           )}
         </div>
+      </div>
+
+      <div className="mt-16 text-center">
+        <a href="#" className="btn-primary inline-flex items-center gap-2 group">
+          Get Started
+          <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+        </a>
       </div>
     </section>
   );

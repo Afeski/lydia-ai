@@ -33,7 +33,7 @@ const BenefitsSection = () => {
   return (
     <section id="benefits" className="section-container bg-white">
       <div className="text-center mb-16">
-        <h2 className="section-title">Benefits of Using Lydia</h2>
+        <h2 className="section-title">Healthcare that feels like Self-care</h2>
         <p className="section-subtitle">
           Discover how Lydia can transform your healthcare experience with these
           key benefits
@@ -47,7 +47,7 @@ const BenefitsSection = () => {
             className="flex flex-col items-center text-center p-6 rounded-xl bg-lydia-lavender/30 border border-lydia-lavender shadow-sm card-hover"
             style={{ animationDelay: `${0.1 * index}s` }}
           >
-            <div className="w-16 h-16 rounded-full bg-lydia-peach/40 flex items-center justify-center mb-4 text-lydia-navy">
+            <div className="w-16 h-16 rounded-full bg-lydia-skyblue/40 flex items-center justify-center mb-4 text-lydia-navy">
               {benefit.icon}
             </div>
             <h3 className="text-xl font-bold text-lydia-navy mb-3">
@@ -59,7 +59,7 @@ const BenefitsSection = () => {
       </div>
 
       <div className="mt-16 text-center animate-fade-in">
-        <a href="#waiting-list" className="btn-primary inline-flex">
+        <a href="#" className="btn-primary inline-flex">
           Experience the Benefits
         </a>
       </div>

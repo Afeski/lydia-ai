@@ -15,12 +15,12 @@ const HeroSection = () => {
               Lydia: Your AI Health Assistant
             </h1>
             <p className="text-lg md:text-xl text-gray-700 mb-8 max-w-lg">
-              Lydia Health Assistant is your AI Health assistant. It gauges your symptoms, schedules appointments with doctors, follows up with reminders for you to take your medication.
+              Lydia is your AI Health companion. It gauges your symptoms, schedules appointments with doctors, and checks in with reminders for you to take your medication.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4">
-              <a href="#waiting-list" className="btn-primary flex items-center justify-center gap-2 group">
-                Join Waiting List
+              <a href="#" className="btn-primary flex items-center justify-center gap-2 group">
+                Get Started
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </a>
               <a href="#how-it-works" className="btn-secondary flex items-center justify-center">

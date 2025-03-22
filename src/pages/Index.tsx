@@ -5,7 +5,6 @@ import NavigationBar from "@/components/NavigationBar";
 import HeroSection from "@/components/HeroSection";
 import VideoSection from "@/components/VideoSection";
 import BenefitsSection from "@/components/BenefitsSection";
-import WaitingListSection from "@/components/WaitingListSection";
 import PartnershipSection from "@/components/PartnershipSection";
 import NewsletterSection from "@/components/NewsletterSection";
 import FooterSection from "@/components/FooterSection";
@@ -67,13 +66,12 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col font-lato">
+    <div className="min-h-screen flex flex-col font-outfit">
       <NavigationBar />
       <main>
         <HeroSection />
         <VideoSection />
         <BenefitsSection />
-        <WaitingListSection />
         <PartnershipSection />
         <NewsletterSection />
       </main>
