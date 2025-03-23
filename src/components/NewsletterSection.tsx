@@ -80,7 +80,7 @@ const NewsletterSection = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full md:w-auto whitespace-nowrap bg-[#CB48B7] text-white px-6 py-3 rounded-md font-medium transition-all duration-300 hover:bg-[#CB48B7]/90 hover:shadow-md flex items-center justify-center gap-2"
+              className="w-full md:w-auto whitespace-nowrap btn-primary flex items-center justify-center gap-2"
             >
               {isSubmitting ? (
                 "Subscribing..."
