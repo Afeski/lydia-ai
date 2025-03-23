@@ -19,25 +19,25 @@ const FooterSection = () => {
             <div className="flex space-x-4">
               <a
                 href="#"
-                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-lydia-skyblue hover:text-[#301A4B] transition-colors duration-300"
+                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#CB48B7] hover:text-white transition-colors duration-300"
               >
                 <Instagram size={18} />
               </a>
               <a
                 href="#"
-                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-lydia-skyblue hover:text-[#301A4B] transition-colors duration-300"
+                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#CB48B7] hover:text-white transition-colors duration-300"
               >
                 <Twitter size={18} />
               </a>
               <a
                 href="#"
-                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-lydia-skyblue hover:text-[#301A4B] transition-colors duration-300"
+                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#CB48B7] hover:text-white transition-colors duration-300"
               >
                 <Facebook size={18} />
               </a>
               <a
                 href="#"
-                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-lydia-skyblue hover:text-[#301A4B] transition-colors duration-300"
+                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#CB48B7] hover:text-white transition-colors duration-300"
               >
                 <Linkedin size={18} />
               </a>
@@ -110,19 +110,19 @@ const FooterSection = () => {
             <h3 className="text-lg font-bold mb-4">Contact</h3>
             <ul className="space-y-4">
               <li className="flex items-start">
-                <MapPin className="w-5 h-5 text-lydia-skyblue mr-3 mt-0.5" />
+                <MapPin className="w-5 h-5 text-[#CB48B7] mr-3 mt-0.5" />
                 <span className="text-gray-300">
                   123 Health Avenue, San Francisco, CA 94107
                 </span>
               </li>
               <li className="flex items-center">
-                <Phone className="w-5 h-5 text-lydia-skyblue mr-3" />
+                <Phone className="w-5 h-5 text-[#CB48B7] mr-3" />
                 <a href="tel:+11234567890" className="text-gray-300 hover:text-white">
                   +1 (123) 456-7890
                 </a>
               </li>
               <li className="flex items-center">
-                <Mail className="w-5 h-5 text-lydia-skyblue mr-3" />
+                <Mail className="w-5 h-5 text-[#CB48B7] mr-3" />
                 <a href="mailto:info@lydiahealth.com" className="text-gray-300 hover:text-white">
                   info@lydiahealth.com
                 </a>

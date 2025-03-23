@@ -10,14 +10,14 @@ const HeroSection = () => {
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
           <div className="w-full lg:w-1/2 stagger-animation">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#301A4B] mb-6 leading-tight">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-[#301A4B] mb-6 leading-tight animate-fade-in">
               Lydia: Your AI Health Assistant
             </h1>
-            <p className="text-lg md:text-xl text-gray-700 mb-8 max-w-lg">
+            <p className="text-lg md:text-xl text-gray-700 mb-8 max-w-lg animate-fade-in" style={{ animationDelay: "0.2s" }}>
               Lydia is your AI Health companion. It gauges your symptoms, schedules appointments with doctors, and checks in with reminders for you to take your medication.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 animate-fade-in" style={{ animationDelay: "0.3s" }}>
               <a href="/signup" className="bg-[#301A4B] text-white px-6 py-3 rounded-md font-medium transition-all duration-300 hover:bg-[#301A4B]/90 hover:shadow-md flex items-center justify-center gap-2 group">
                 Get Started
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -28,8 +28,8 @@ const HeroSection = () => {
             </div>
           </div>
           
-          <div className="w-full lg:w-1/2 animate-fade-in">
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl transform transition-all hover:scale-[1.01] duration-500 ease-in-out">
+          <div className="w-full lg:w-1/2 animate-fade-in" style={{ animationDelay: "0.4s" }}>
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl transform transition-all hover:scale-[1.01] duration-500 ease-in-out animate-float">
               <div className="absolute inset-0 bg-gradient-to-tr from-[#301A4B]/30 to-transparent z-10 rounded-2xl"></div>
               <img
                 src="/lovable-uploads/0939a336-cfed-44d2-8108-b7c0d3b9810d.png"

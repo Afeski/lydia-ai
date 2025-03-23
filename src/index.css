@@ -20,7 +20,7 @@
     --secondary: 240 67% 94%; /* E6E6FA in HSL */
     --secondary-foreground: 220 64% 11%;
 
-    --muted: 199 68% 73%; /* 87CEEB in HSL */
+    --muted: 321 60% 54%; /* CB48B7 in HSL (was 87CEEB) */
     --muted-foreground: 220 64% 11%;
 
     --accent: 28 100% 86%; /* FFDAB9 in HSL */
@@ -31,7 +31,7 @@
 
     --border: 220 14% 90%;
     --input: 220 14% 90%;
-    --ring: 199 68% 73%; /* 87CEEB in HSL */
+    --ring: 321 60% 54%; /* CB48B7 in HSL (was 87CEEB) */
 
     --radius: 0.5rem;
   }
@@ -52,7 +52,7 @@
     --secondary: 240 67% 94%;
     --secondary-foreground: 220 64% 11%;
 
-    --muted: 199 68% 73%;
+    --muted: 321 60% 54%; /* CB48B7 in HSL (was 87CEEB) */
     --muted-foreground: 220 64% 11%;
 
     --accent: 28 100% 86%;
@@ -191,4 +191,30 @@
 .page-transition-exit-active {
   opacity: 0;
   transition: opacity 300ms;
+}
+
+/* Dashboard specific styles */
+.dashboard-container {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6;
+}
+
+.dashboard-card {
+  @apply bg-white rounded-xl shadow-md p-6 transition-all duration-300 hover:shadow-lg;
+}
+
+.dashboard-section-title {
+  @apply text-2xl font-bold text-[#301A4B] mb-4;
+}
+
+/* Animation for list items */
+.list-item-appear {
+  @apply opacity-0 translate-y-4;
+  animation: list-item-appear 0.5s forwards;
+  animation-delay: calc(var(--index) * 0.1s);
+}
+
+@keyframes list-item-appear {
+  to {
+    @apply opacity-100 translate-y-0;
+  }
 }
