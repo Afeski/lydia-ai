@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { 
@@ -24,6 +25,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const signUpSchema = z.object({
   firstName: z.string().min(2, { message: "First name must be at least 2 characters." }),
@@ -45,6 +47,7 @@ type SignUpFormValues = z.infer<typeof signUpSchema>;
 
 const SignUp = ({ onSignUpSuccess = () => {} }) => {
   const navigate = useNavigate();
+  const { signUp } = useAuth();
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -57,18 +60,38 @@ const SignUp = ({ onSignUpSuccess = () => {} }) => {
     },
   });
 
-  function onSubmit(data) {
-    console.log(data);
-    toast({
-      title: "Account created!",
-      description: "Your account has been successfully created.",
-    });
-    
-    // Call the signup success callback
-    onSignUpSuccess();
-    
-    // Redirect to onboarding
-    setTimeout(() => navigate("/onboarding"), 1500);
+  async function onSubmit(data: SignUpFormValues) {
+    try {
+      const { error } = await signUp(data.email, data.password);
+      
+      if (error) {
+        console.error("Signup error:", error);
+        toast({
+          title: "Signup failed",
+          description: error.message || "There was a problem creating your account",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      toast({
+        title: "Account created!",
+        description: "Your account has been successfully created.",
+      });
+      
+      // Call the signup success callback
+      onSignUpSuccess();
+      
+      // Redirect to onboarding
+      setTimeout(() => navigate("/onboarding"), 1500);
+    } catch (error) {
+      console.error("Signup error:", error);
+      toast({
+        title: "Something went wrong",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    }
   }
 
   const handleGoogleSignUp = () => {

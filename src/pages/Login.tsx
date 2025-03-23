@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, ArrowRight } from "lucide-react";
@@ -16,6 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
@@ -27,6 +29,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Login = ({ onLoginSuccess = () => {} }) => {
   const navigate = useNavigate();
+  const { signIn } = useAuth();
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -36,19 +39,38 @@ const Login = ({ onLoginSuccess = () => {} }) => {
     },
   });
 
-  function onSubmit(data: LoginFormValues) {
-    // Here you would typically connect to your authentication service
-    console.log(data);
-    toast({
-      title: "Welcome back!",
-      description: "You've successfully logged in to Lydia.",
-    });
-    
-    // Call login success callback
-    onLoginSuccess();
-    
-    // Redirect to onboarding page
-    setTimeout(() => navigate("/onboarding"), 1500);
+  async function onSubmit(data: LoginFormValues) {
+    try {
+      const { error } = await signIn(data.email, data.password);
+      
+      if (error) {
+        console.error("Login error:", error);
+        toast({
+          title: "Login failed",
+          description: error.message || "There was a problem logging in",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      toast({
+        title: "Welcome back!",
+        description: "You've successfully logged in to Lydia.",
+      });
+      
+      // Call login success callback
+      onLoginSuccess();
+      
+      // Redirect to onboarding page
+      setTimeout(() => navigate("/onboarding"), 1500);
+    } catch (error) {
+      console.error("Login error:", error);
+      toast({
+        title: "Something went wrong",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    }
   }
 
   const handleGoogleLogin = () => {

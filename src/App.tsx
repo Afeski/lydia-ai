@@ -20,44 +20,102 @@ import NotFound from "./pages/NotFound";
 import OnboardingPage from "./pages/OnboardingPage";
 import Dashboard from "./pages/Dashboard";
 import { useEffect, useState } from "react";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient();
 
+// Protected Route component
+const ProtectedRoute = ({ 
+  children, 
+  requiresAuth = true, 
+  requiresOnboarding = false,
+  redirectTo = "/login"
+}) => {
+  const { user, loading } = useAuth();
+  const isAuthenticated = !!user;
+  const isOnboarded = localStorage.getItem("isOnboarded") === "true";
+  
+  // Show loading state while checking auth
+  if (loading) {
+    return <div className="flex h-screen items-center justify-center">Loading...</div>;
+  }
+  
+  // If auth is required but user is not authenticated
+  if (requiresAuth && !isAuthenticated) {
+    return <Navigate to={redirectTo} />;
+  }
+  
+  // If user is authenticated but not onboarded and onboarding is required
+  if (requiresAuth && isAuthenticated && requiresOnboarding && !isOnboarded) {
+    return <Navigate to="/onboarding" />;
+  }
+  
+  // If user is already authenticated and trying to access login/signup
+  if (!requiresAuth && isAuthenticated) {
+    return <Navigate to={isOnboarded ? "/dashboard" : "/onboarding"} />;
+  }
+  
+  return children;
+};
+
+const AppRoutes = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<Index />} />
+      <Route 
+        path="/login" 
+        element={
+          <ProtectedRoute requiresAuth={false} redirectTo="/dashboard">
+            <Login />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/signup" 
+        element={
+          <ProtectedRoute requiresAuth={false} redirectTo="/dashboard">
+            <SignUp />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/onboarding" 
+        element={
+          <ProtectedRoute requiresAuth={true} redirectTo="/login">
+            <OnboardingPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/dashboard" 
+        element={
+          <ProtectedRoute requiresAuth={true} requiresOnboarding={true} redirectTo="/login">
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
+
 const App = () => {
-  // Mock authentication state - in a real app, this would come from your auth provider
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isOnboarded, setIsOnboarded] = useState(false);
-
-  // Check localStorage for auth status on app load
+  // These methods are still useful for demo purposes
   useEffect(() => {
-    const authStatus = localStorage.getItem("isAuthenticated");
-    if (authStatus === "true") {
-      setIsAuthenticated(true);
-    }
-    
-    const onboardStatus = localStorage.getItem("isOnboarded");
-    if (onboardStatus === "true") {
-      setIsOnboarded(true);
-    }
+    window.loginUser = () => {
+      localStorage.setItem("isAuthenticated", "true");
+    };
+
+    window.logoutUser = () => {
+      localStorage.removeItem("isAuthenticated");
+      localStorage.removeItem("isOnboarded");
+    };
+
+    window.completeOnboarding = () => {
+      localStorage.setItem("isOnboarded", "true");
+    };
   }, []);
-
-  // For demo purposes - to simulate login/logout
-  window.loginUser = () => {
-    localStorage.setItem("isAuthenticated", "true");
-    setIsAuthenticated(true);
-  };
-
-  window.logoutUser = () => {
-    localStorage.removeItem("isAuthenticated");
-    localStorage.removeItem("isOnboarded");
-    setIsAuthenticated(false);
-    setIsOnboarded(false);
-  };
-
-  window.completeOnboarding = () => {
-    localStorage.setItem("isOnboarded", "true");
-    setIsOnboarded(true);
-  };
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -65,55 +123,9 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route 
-              path="/login" 
-              element={
-                isAuthenticated ? (
-                  <Navigate to={isOnboarded ? "/dashboard" : "/onboarding"} />
-                ) : (
-                  <Login onLoginSuccess={() => window.loginUser()} />
-                )
-              } 
-            />
-            <Route 
-              path="/signup" 
-              element={
-                isAuthenticated ? (
-                  <Navigate to={isOnboarded ? "/dashboard" : "/onboarding"} />
-                ) : (
-                  <SignUp onSignUpSuccess={() => window.loginUser()} />
-                )
-              } 
-            />
-            <Route 
-              path="/onboarding" 
-              element={
-                !isAuthenticated ? (
-                  <Navigate to="/login" />
-                ) : isOnboarded ? (
-                  <Navigate to="/dashboard" />
-                ) : (
-                  <OnboardingPage onComplete={() => window.completeOnboarding()} />
-                )
-              } 
-            />
-            <Route 
-              path="/dashboard" 
-              element={
-                !isAuthenticated ? (
-                  <Navigate to="/login" />
-                ) : !isOnboarded ? (
-                  <Navigate to="/onboarding" />
-                ) : (
-                  <Dashboard />
-                )
-              }
-            />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <AuthProvider>
+            <AppRoutes />
+          </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>

@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { 
@@ -23,10 +22,13 @@ import {
   CalendarCheck,
   Pill,
   ChevronRight,
-  Search
+  Search,
+  Mic,
+  MicOff
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "@/hooks/use-toast";
 
-// Simulated user data
 const userData = {
   name: "John Doe",
   upcomingAppointments: [
@@ -42,18 +44,40 @@ const userData = {
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { signOut } = useAuth();
   const [activeChat, setActiveChat] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [messages, setMessages] = useState([
     { id: 1, sender: "system", text: "Hello! I'm Lydia, your AI health assistant. How can I help you today?", time: "Just now" }
   ]);
-
   const [userInput, setUserInput] = useState("");
+  const [isRecording, setIsRecording] = useState(false);
+  const [isAIProcessing, setIsAIProcessing] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
 
-  const handleSendMessage = (e) => {
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Logged out",
+        description: "You have been successfully logged out",
+      });
+      navigate("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to log out. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userInput.trim()) return;
-
+    if (!userInput.trim() && !isRecording) return;
+    
     // Add user message
     const newUserMessage = {
       id: messages.length + 1,
@@ -62,20 +86,153 @@ const Dashboard = () => {
       time: "Just now"
     };
     
-    setMessages([...messages, newUserMessage]);
+    setMessages(prev => [...prev, newUserMessage]);
     setUserInput("");
     
-    // Simulate AI response after a delay
-    setTimeout(() => {
+    // Process with Gemini
+    setIsAIProcessing(true);
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message: userInput })
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to get AI response");
+      }
+      
+      const data = await response.json();
+      
+      // Add AI response
       const aiResponse = {
         id: messages.length + 2,
         sender: "system",
-        text: "I can help you with that! Would you like me to check your symptoms or schedule an appointment with a doctor?",
+        text: data.response || "I can help you with that! Would you like me to check your symptoms or schedule an appointment with a doctor?",
         time: "Just now"
       };
       
       setMessages(prev => [...prev, aiResponse]);
-    }, 1000);
+      
+      // Convert to speech
+      await convertToSpeech(aiResponse.text);
+    } catch (error) {
+      console.error("Error processing message:", error);
+      toast({
+        title: "Error",
+        description: "Failed to process your message. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsAIProcessing(false);
+    }
+  };
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+      
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+      
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const reader = new FileReader();
+        reader.readAsDataURL(audioBlob);
+        reader.onloadend = async () => {
+          const base64Audio = reader.result?.toString().split(',')[1] || '';
+          
+          // Get transcription
+          try {
+            const response = await fetch("/api/transcribe", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({ audio: base64Audio })
+            });
+            
+            if (!response.ok) {
+              throw new Error("Failed to transcribe audio");
+            }
+            
+            const data = await response.json();
+            setUserInput(data.text);
+            
+            // Automatically send the message after transcription
+            setTimeout(() => {
+              const fakeEvent = { preventDefault: () => {} } as React.FormEvent;
+              handleSendMessage(fakeEvent);
+            }, 500);
+          } catch (error) {
+            console.error("Transcription error:", error);
+            toast({
+              title: "Transcription failed",
+              description: "Could not convert your speech to text. Please try again.",
+              variant: "destructive"
+            });
+          }
+        };
+        
+        // Close audio tracks
+        stream.getTracks().forEach(track => track.stop());
+      };
+      
+      mediaRecorder.start();
+      setIsRecording(true);
+      
+      toast({
+        title: "Recording",
+        description: "I'm listening to you now. Speak clearly.",
+      });
+    } catch (error) {
+      console.error("Recording error:", error);
+      toast({
+        title: "Microphone error",
+        description: "Could not access your microphone. Please check permissions.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const convertToSpeech = async (text: string) => {
+    try {
+      const response = await fetch("/api/text-to-speech", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ text })
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to convert text to speech");
+      }
+      
+      const data = await response.json();
+      const audioContent = data.audioContent;
+      
+      // Play the audio
+      const audio = new Audio(`data:audio/mpeg;base64,${audioContent}`);
+      audio.play();
+    } catch (error) {
+      console.error("Text-to-speech error:", error);
+    }
   };
 
   const startSymptomAssessment = () => {
@@ -104,7 +261,6 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Dashboard header */}
       <header className="bg-[#301A4B] text-white">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold">Lydia</h1>
@@ -116,6 +272,9 @@ const Dashboard = () => {
             <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
               <Settings className="h-5 w-5" />
             </Button>
+            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10" onClick={handleLogout}>
+              <LogOut className="h-5 w-5" />
+            </Button>
             <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center text-sm font-medium">
               JD
             </div>
@@ -124,7 +283,6 @@ const Dashboard = () => {
       </header>
 
       <div className="dashboard-container grid grid-cols-1 lg:grid-cols-3 gap-6 py-6">
-        {/* Sidebar */}
         <div className="lg:col-span-1 space-y-6">
           <Card className="animate-fade-in">
             <CardHeader className="pb-2">
@@ -230,7 +388,6 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        {/* Main content - Chat with Lydia */}
         <div className="lg:col-span-2">
           <Card className="h-[calc(100vh-150px)] flex flex-col animate-scale-in">
             <CardHeader className="pb-2 border-b">
@@ -276,11 +433,26 @@ const Dashboard = () => {
                     className="w-full p-3 pr-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CB48B7] focus:border-transparent"
                     value={userInput}
                     onChange={(e) => setUserInput(e.target.value)}
+                    disabled={isRecording || isAIProcessing}
                   />
                   <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 </div>
                 
-                <Button type="submit" className="bg-[#301A4B] hover:bg-[#301A4B]/90">
+                <Button 
+                  type="button" 
+                  variant="outline"
+                  onClick={isRecording ? stopRecording : startRecording}
+                  className={`${isRecording ? 'bg-red-100 text-red-600 border-red-300' : ''}`}
+                  disabled={isAIProcessing}
+                >
+                  {isRecording ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+                </Button>
+                
+                <Button 
+                  type="submit" 
+                  className="bg-[#301A4B] hover:bg-[#301A4B]/90"
+                  disabled={isRecording || isAIProcessing || (!userInput.trim() && !isRecording)}
+                >
                   Send
                 </Button>
               </form>
