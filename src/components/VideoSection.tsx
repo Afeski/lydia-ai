@@ -1,16 +1,11 @@
-
 import React, { useState } from "react";
 import { Play, Calendar, ArrowRight } from "lucide-react";
-
 const VideoSection = () => {
   const [isPlaying, setIsPlaying] = useState(false);
-
   const handlePlayVideo = () => {
     setIsPlaying(true);
   };
-
-  return (
-    <section id="how-it-works" className="section-container bg-lydia-cream/50">
+  return <section id="how-it-works" className="section-container bg-lydia-cream/50">
       <div className="text-center mb-16">
         <h2 className="section-title">How Lydia Works</h2>
         <p className="section-subtitle">
@@ -22,11 +17,7 @@ const VideoSection = () => {
         <div className="space-y-8">
           <div className="flex items-start space-x-6">
             <div className="flex-shrink-0 w-12 h-12 rounded-full bg-white flex items-center justify-center">
-              <img 
-                src="/lovable-uploads/5c889aa0-c042-43e0-bb24-6a4e4f22c9b6.png" 
-                alt="Thermometer" 
-                className="w-8 h-8 object-contain"
-              />
+              <img alt="Thermometer" className="w-8 h-8 object-contain" src="/lovable-uploads/5cf72dfe-bea1-49c2-99d7-c25133847b07.jpg" />
             </div>
             <div>
               <h3 className="text-xl font-bold text-lydia-navy mb-2">Symptom Assessment</h3>
@@ -38,11 +29,7 @@ const VideoSection = () => {
 
           <div className="flex items-start space-x-6">
             <div className="flex-shrink-0 w-12 h-12 rounded-full bg-white flex items-center justify-center">
-              <img
-                src="/lovable-uploads/c3040a8f-783d-4f0b-a818-b5ee8f6c39d7.png"
-                alt="Calendar"
-                className="w-8 h-8 object-contain" 
-              />
+              <img src="/lovable-uploads/c3040a8f-783d-4f0b-a818-b5ee8f6c39d7.png" alt="Calendar" className="w-8 h-8 object-contain" />
             </div>
             <div>
               <h3 className="text-xl font-bold text-lydia-navy mb-2">Schedule Consultations</h3>
@@ -54,11 +41,7 @@ const VideoSection = () => {
 
           <div className="flex items-start space-x-6">
             <div className="flex-shrink-0 w-12 h-12 rounded-full bg-white flex items-center justify-center">
-              <img 
-                src="/lovable-uploads/fadff368-a2fd-4d7c-8e19-35488b2474b1.png" 
-                alt="Pill" 
-                className="w-8 h-8 object-contain"
-              />
+              <img src="/lovable-uploads/fadff368-a2fd-4d7c-8e19-35488b2474b1.png" alt="Pill" className="w-8 h-8 object-contain" />
             </div>
             <div>
               <h3 className="text-xl font-bold text-lydia-navy mb-2">Medication Reminders</h3>
@@ -70,34 +53,17 @@ const VideoSection = () => {
         </div>
 
         <div className="relative rounded-2xl overflow-hidden shadow-xl">
-          {isPlaying ? (
-            <iframe
-              width="100%"
-              height="315"
-              src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
-              title="Lydia Health Assistant Demo"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="aspect-video rounded-2xl"
-            ></iframe>
-          ) : (
-            <div className="relative group cursor-pointer" onClick={handlePlayVideo}>
+          {isPlaying ? <iframe width="100%" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1" title="Lydia Health Assistant Demo" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="aspect-video rounded-2xl"></iframe> : <div className="relative group cursor-pointer" onClick={handlePlayVideo}>
               <div className="absolute inset-0 bg-lydia-navy/20 group-hover:bg-lydia-navy/30 transition-all duration-300 flex items-center justify-center rounded-2xl">
                 <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg transform transition-transform group-hover:scale-110">
                   <Play className="w-8 h-8 text-lydia-navy fill-current ml-1" />
                 </div>
               </div>
-              <img
-                src="/lovable-uploads/0939a336-cfed-44d2-8108-b7c0d3b9810d.png"
-                alt="Lydia Demo Video Thumbnail"
-                className="w-full aspect-video object-cover rounded-2xl"
-              />
+              <img src="/lovable-uploads/0939a336-cfed-44d2-8108-b7c0d3b9810d.png" alt="Lydia Demo Video Thumbnail" className="w-full aspect-video object-cover rounded-2xl" />
               <div className="absolute bottom-4 left-4 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-lg">
                 <p className="font-semibold text-lydia-navy">Watch Demo (2:15)</p>
               </div>
-            </div>
-          )}
+            </div>}
         </div>
       </div>
 
@@ -107,8 +73,6 @@ const VideoSection = () => {
           <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
         </a>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default VideoSection;
