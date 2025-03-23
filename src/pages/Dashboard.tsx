@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -65,34 +64,36 @@ const Dashboard = () => {
   // Initialize speech recognition
   useEffect(() => {
     if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
-      // @ts-ignore
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognitionRef.current = new SpeechRecognition();
-      recognitionRef.current.continuous = true;
-      recognitionRef.current.interimResults = false;
-      recognitionRef.current.lang = 'en-US';
+      const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognitionAPI();
       
-      recognitionRef.current.onresult = (event) => {
-        const transcript = event.results[event.results.length - 1][0].transcript;
-        setUserInput(transcript);
-        handleSendMessage(null, transcript);
-      };
-      
-      recognitionRef.current.onerror = (event) => {
-        console.error('Speech recognition error', event);
-        setIsListening(false);
-        toast({
-          title: "Voice recognition error",
-          description: "Please try again or type your message",
-          variant: "destructive"
-        });
-      };
-      
-      recognitionRef.current.onend = () => {
-        if (isListening) {
-          recognitionRef.current?.start();
-        }
-      };
+      if (recognitionRef.current) {
+        recognitionRef.current.continuous = true;
+        recognitionRef.current.interimResults = false;
+        recognitionRef.current.lang = 'en-US';
+        
+        recognitionRef.current.onresult = (event) => {
+          const transcript = event.results[event.results.length - 1][0].transcript;
+          setUserInput(transcript);
+          handleSendMessage(null, transcript);
+        };
+        
+        recognitionRef.current.onerror = (event) => {
+          console.error('Speech recognition error', event);
+          setIsListening(false);
+          toast({
+            title: "Voice recognition error",
+            description: "Please try again or type your message",
+            variant: "destructive"
+          });
+        };
+        
+        recognitionRef.current.onend = () => {
+          if (isListening) {
+            recognitionRef.current?.start();
+          }
+        };
+      }
     }
     
     return () => {
@@ -151,9 +152,7 @@ const Dashboard = () => {
   };
 
   const handleLogout = () => {
-    // Call the global logout function
     window.logoutUser();
-    // Navigate to home page
     navigate("/");
     toast({
       title: "Logged out",
@@ -167,7 +166,6 @@ const Dashboard = () => {
     const inputText = voiceTranscript || userInput;
     if (!inputText.trim()) return;
 
-    // Add user message
     const newUserMessage = {
       id: messages.length + 1,
       sender: "user",
@@ -180,7 +178,6 @@ const Dashboard = () => {
     setIsLoading(true);
     
     try {
-      // Simulate AI response after a delay
       setTimeout(async () => {
         const aiResponseText = "I can help you with that! Would you like me to check your symptoms or schedule an appointment with a doctor?";
         
@@ -194,14 +191,13 @@ const Dashboard = () => {
         setMessages(prev => [...prev, aiResponse]);
         setIsLoading(false);
         
-        // Convert the text to speech using ElevenLabs
         if (!isMuted) {
           try {
             const response = await fetch('https://api.elevenlabs.io/v1/text-to-speech/EXAVITQu4vr4xnSDxMaL', {
               method: 'POST',
               headers: {
                 'accept': 'audio/mpeg',
-                'xi-api-key': 'Unforgiving Bald Eagle', // This is just a placeholder
+                'xi-api-key': 'Unforgiving Bald Eagle',
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
@@ -218,7 +214,6 @@ const Dashboard = () => {
               const blob = await response.blob();
               const audioUrl = URL.createObjectURL(blob);
               
-              // Create or update audio element
               if (!audioRef.current) {
                 audioRef.current = new Audio(audioUrl);
                 audioRef.current.muted = isMuted;
@@ -226,7 +221,6 @@ const Dashboard = () => {
                 audioRef.current.src = audioUrl;
               }
               
-              // Play the audio
               audioRef.current.play();
             } else {
               console.error('Error fetching audio from ElevenLabs:', response.statusText);
@@ -273,7 +267,6 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Dashboard header */}
       <header className="bg-[#301A4B] text-white">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold">Lydia</h1>
@@ -302,7 +295,6 @@ const Dashboard = () => {
       </header>
 
       <div className="dashboard-container grid grid-cols-1 lg:grid-cols-3 gap-6 py-6">
-        {/* Sidebar */}
         <div className="lg:col-span-1 space-y-6">
           <Card className="animate-fade-in">
             <CardHeader className="pb-2">
@@ -408,7 +400,6 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        {/* Main content - Chat with Lydia */}
         <div className="lg:col-span-2">
           <Card className="h-[calc(100vh-150px)] flex flex-col animate-scale-in">
             <CardHeader className="pb-2 border-b">
