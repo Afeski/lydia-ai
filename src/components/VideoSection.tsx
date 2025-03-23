@@ -41,7 +41,7 @@ const VideoSection = () => {
 
           <div className="flex items-start space-x-6">
             <div className="flex-shrink-0 w-12 h-12 rounded-full bg-white flex items-center justify-center">
-              <img src="/lovable-uploads/fadff368-a2fd-4d7c-8e19-35488b2474b1.png" alt="Pill" className="w-8 h-8 object-contain" />
+              <img alt="Pill" className="w-8 h-8 object-contain" src="/lovable-uploads/6a9fb43b-c9f3-4ec2-b559-3a1b69e44d80.jpg" />
             </div>
             <div>
               <h3 className="text-xl font-bold text-lydia-navy mb-2">Medication Reminders</h3>
