@@ -19,6 +19,7 @@ import SignUp from "./pages/SignUp";
 import NotFound from "./pages/NotFound";
 import OnboardingPage from "./pages/OnboardingPage";
 import Dashboard from "./pages/Dashboard";
+import LearnMore from "./pages/LearnMore";
 import { useEffect, useState } from "react";
 
 const queryClient = new QueryClient();
@@ -67,6 +68,7 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/learn-more" element={<LearnMore />} />
             <Route 
               path="/login" 
               element={

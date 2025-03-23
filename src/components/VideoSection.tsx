@@ -23,8 +23,8 @@ const VideoSection = () => {
           <div className="flex items-start space-x-6">
             <div className="flex-shrink-0 w-12 h-12 rounded-full bg-white flex items-center justify-center">
               <img 
-                src="/lovable-uploads/5c889aa0-c042-43e0-bb24-6a4e4f22c9b6.png" 
-                alt="Thermometer" 
+                src="/lovable-uploads/c3040a8f-783d-4f0b-a818-b5ee8f6c39d7.png" 
+                alt="Calendar" 
                 className="w-8 h-8 object-contain"
               />
             </div>
@@ -39,8 +39,8 @@ const VideoSection = () => {
           <div className="flex items-start space-x-6">
             <div className="flex-shrink-0 w-12 h-12 rounded-full bg-white flex items-center justify-center">
               <img
-                src="/lovable-uploads/c3040a8f-783d-4f0b-a818-b5ee8f6c39d7.png"
-                alt="Calendar"
+                src="/lovable-uploads/5c889aa0-c042-43e0-bb24-6a4e4f22c9b6.png"
+                alt="Thermometer"
                 className="w-8 h-8 object-contain" 
               />
             </div>
@@ -102,7 +102,7 @@ const VideoSection = () => {
       </div>
 
       <div className="mt-16 text-center">
-        <a href="/signup" className="btn-primary inline-flex items-center gap-2 group">
+        <a href="/signup" className="bg-[#CB48B7] text-white px-6 py-3 rounded-md font-medium transition-all duration-300 hover:bg-[#CB48B7]/90 hover:shadow-md inline-flex items-center gap-2 group">
           Get Started
           <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
         </a>

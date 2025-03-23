@@ -22,8 +22,8 @@ const HeroSection = () => {
                 Get Started
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </a>
-              <a href="#how-it-works" className="bg-lydia-lavender text-[#301A4B] px-6 py-3 rounded-md font-medium transition-all duration-300 hover:bg-lydia-lavender/80 hover:shadow-md flex items-center justify-center">
-                Watch How It Works
+              <a href="/learn-more" className="bg-[#CB48B7] text-white px-6 py-3 rounded-md font-medium transition-all duration-300 hover:bg-[#CB48B7]/80 hover:shadow-md flex items-center justify-center">
+                Learn More
               </a>
             </div>
           </div>
