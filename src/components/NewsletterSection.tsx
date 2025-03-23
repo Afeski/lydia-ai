@@ -1,43 +1,35 @@
-
 import React, { useState } from "react";
 import { Send } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
-
 const NewsletterSection = () => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!email) {
       toast({
         title: "Email Required",
         description: "Please enter your email address",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-    
     setIsSubmitting(true);
-    
+
     // Simulate form submission
     setTimeout(() => {
       setIsSubmitting(false);
       setEmail("");
       setName("");
-      
       toast({
         title: "Subscribed!",
         description: "You've been subscribed to our newsletter. Thank you!",
-        duration: 5000,
+        duration: 5000
       });
     }, 1000);
   };
-
-  return (
-    <section className="section-container py-16 bg-lydia-peach/30">
+  return <section className="section-container py-16 bg-[#f8f1e9]">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-10">
           <h2 className="text-2xl sm:text-3xl font-bold text-lydia-navy mb-4">
@@ -54,41 +46,18 @@ const NewsletterSection = () => {
               <label htmlFor="newsletter-name" className="sr-only">
                 Your Name
               </label>
-              <input
-                type="text"
-                id="newsletter-name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Your Name"
-                className="input-field"
-              />
+              <input type="text" id="newsletter-name" value={name} onChange={e => setName(e.target.value)} placeholder="Your Name" className="input-field" />
             </div>
             <div className="flex-1">
               <label htmlFor="newsletter-email" className="sr-only">
                 Email Address
               </label>
-              <input
-                type="email"
-                id="newsletter-email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Your Email Address"
-                required
-                className="input-field"
-              />
+              <input type="email" id="newsletter-email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Your Email Address" required className="input-field" />
             </div>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full md:w-auto whitespace-nowrap btn-primary flex items-center justify-center gap-2"
-            >
-              {isSubmitting ? (
-                "Subscribing..."
-              ) : (
-                <>
+            <button type="submit" disabled={isSubmitting} className="w-full md:w-auto whitespace-nowrap btn-primary flex items-center justify-center gap-2">
+              {isSubmitting ? "Subscribing..." : <>
                   Subscribe <Send className="w-4 h-4" />
-                </>
-              )}
+                </>}
             </button>
           </form>
           <p className="text-xs text-gray-500 mt-4 text-center">
@@ -96,8 +65,6 @@ const NewsletterSection = () => {
           </p>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default NewsletterSection;
