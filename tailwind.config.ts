@@ -59,9 +59,9 @@ export default {
 				lydia: {
 					lavender: '#E6E6FA',
 					peach: '#FFDAB9',
-					navy: '#301A4B', // Changed from #0A122A to #301A4B
+					navy: '#301A4B', 
 					cream: '#F8F1E9',
-					skyblue: '#CB48B7', // Changed from #87CEEB to #CB48B7
+					skyblue: '#E6E6FA', // Changed from #CB48B7 to #E6E6FA
 					purple: '#805D93',
 				},
 				sidebar: {

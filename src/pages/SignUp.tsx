@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { 
@@ -44,7 +43,7 @@ const signUpSchema = z.object({
 
 type SignUpFormValues = z.infer<typeof signUpSchema>;
 
-const SignUp = () => {
+const SignUp = ({ onSignUpSuccess = () => {} }) => {
   const navigate = useNavigate();
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
@@ -58,24 +57,30 @@ const SignUp = () => {
     },
   });
 
-  function onSubmit(data: SignUpFormValues) {
-    // Here you would typically connect to your authentication service
+  function onSubmit(data) {
     console.log(data);
     toast({
       title: "Account created!",
-      description: "You've successfully signed up for Lydia.",
+      description: "Your account has been successfully created.",
     });
     
-    // Redirect to home or dashboard
-    setTimeout(() => navigate("/"), 1500);
+    // Call the signup success callback
+    onSignUpSuccess();
+    
+    // Redirect to onboarding
+    setTimeout(() => navigate("/onboarding"), 1500);
   }
 
   const handleGoogleSignUp = () => {
-    // Logic for Google authentication would go here
+    // Logic for Google sign up would go here
     toast({
       title: "Google Sign Up",
       description: "Google authentication feature coming soon!",
     });
+    
+    // For demo purposes, simulate successful signup
+    onSignUpSuccess();
+    setTimeout(() => navigate("/onboarding"), 1500);
   };
 
   return (

@@ -20,8 +20,8 @@ const VideoSection = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         <div className="space-y-8">
-          <div className="flex items-start space-x-6 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-            <div className="flex-shrink-0 w-12 h-12 rounded-full bg-lydia-skyblue/20 flex items-center justify-center animate-bounce-subtle">
+          <div className="flex items-start space-x-6">
+            <div className="flex-shrink-0 w-12 h-12 rounded-full bg-white flex items-center justify-center">
               <img 
                 src="/lovable-uploads/5c889aa0-c042-43e0-bb24-6a4e4f22c9b6.png" 
                 alt="Thermometer" 
@@ -36,8 +36,8 @@ const VideoSection = () => {
             </div>
           </div>
 
-          <div className="flex items-start space-x-6 animate-fade-in" style={{ animationDelay: "0.2s" }}>
-            <div className="flex-shrink-0 w-12 h-12 rounded-full bg-lydia-skyblue/20 flex items-center justify-center animate-bounce-subtle" style={{ animationDelay: "0.5s" }}>
+          <div className="flex items-start space-x-6">
+            <div className="flex-shrink-0 w-12 h-12 rounded-full bg-white flex items-center justify-center">
               <img
                 src="/lovable-uploads/c3040a8f-783d-4f0b-a818-b5ee8f6c39d7.png"
                 alt="Calendar"
@@ -52,8 +52,8 @@ const VideoSection = () => {
             </div>
           </div>
 
-          <div className="flex items-start space-x-6 animate-fade-in" style={{ animationDelay: "0.3s" }}>
-            <div className="flex-shrink-0 w-12 h-12 rounded-full bg-lydia-skyblue/20 flex items-center justify-center animate-bounce-subtle" style={{ animationDelay: "1s" }}>
+          <div className="flex items-start space-x-6">
+            <div className="flex-shrink-0 w-12 h-12 rounded-full bg-white flex items-center justify-center">
               <img 
                 src="/lovable-uploads/fadff368-a2fd-4d7c-8e19-35488b2474b1.png" 
                 alt="Pill" 
@@ -69,7 +69,7 @@ const VideoSection = () => {
           </div>
         </div>
 
-        <div className="relative rounded-2xl overflow-hidden shadow-xl animate-scale-in">
+        <div className="relative rounded-2xl overflow-hidden shadow-xl">
           {isPlaying ? (
             <iframe
               width="100%"

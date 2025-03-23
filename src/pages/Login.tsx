@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, ArrowRight } from "lucide-react";
@@ -26,7 +25,7 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-const Login = () => {
+const Login = ({ onLoginSuccess = () => {} }) => {
   const navigate = useNavigate();
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -45,8 +44,11 @@ const Login = () => {
       description: "You've successfully logged in to Lydia.",
     });
     
-    // Redirect to home or dashboard
-    setTimeout(() => navigate("/"), 1500);
+    // Call login success callback
+    onLoginSuccess();
+    
+    // Redirect to onboarding page
+    setTimeout(() => navigate("/onboarding"), 1500);
   }
 
   const handleGoogleLogin = () => {
@@ -55,6 +57,10 @@ const Login = () => {
       title: "Google Sign In",
       description: "Google authentication feature coming soon!",
     });
+    
+    // For demo purposes, simulate successful login
+    onLoginSuccess();
+    setTimeout(() => navigate("/onboarding"), 1500);
   };
 
   return (
