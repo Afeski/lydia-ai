@@ -1,4 +1,13 @@
 
+// Extend the Window interface to include our custom methods
+declare global {
+  interface Window {
+    loginUser: () => void;
+    logoutUser: () => void;
+    completeOnboarding: () => void;
+  }
+}
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
