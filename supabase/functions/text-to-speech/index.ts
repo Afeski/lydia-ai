@@ -23,8 +23,17 @@ serve(async (req) => {
       throw new Error('ElevenLabs API key is not configured')
     }
 
+    // Map the voice name to an ElevenLabs voice ID
+    const voiceIds = {
+      "Emily": "EXAVITQu4vr4xnSDxMaL",
+      "Lydia": "pFZP5JQG7iQjIQuC4Bku", // Using Lily's voice ID for Lydia
+      "Default": "EXAVITQu4vr4xnSDxMaL" // Sarah as fallback 
+    };
+    
+    const voiceId = voiceIds[voice] || voiceIds.Default;
+
     // Use ElevenLabs API to convert text to speech
-    const response = await fetch('https://api.elevenlabs.io/v1/text-to-speech/CYw3kZ02Hs0563khs1Fj', {
+    const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
       method: 'POST',
       headers: {
         'Accept': 'audio/mpeg',

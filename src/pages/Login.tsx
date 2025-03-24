@@ -61,8 +61,11 @@ const Login = ({ onLoginSuccess = () => {} }) => {
       // Call login success callback
       onLoginSuccess();
       
-      // Redirect to onboarding page
-      setTimeout(() => navigate("/onboarding"), 1500);
+      // Mark as onboarded for existing users (they'll be checked for new user status in ProtectedRoute)
+      localStorage.setItem("isOnboarded", "true");
+      
+      // Redirect directly to dashboard
+      setTimeout(() => navigate("/dashboard"), 1500);
     } catch (error) {
       console.error("Login error:", error);
       toast({
@@ -82,7 +85,8 @@ const Login = ({ onLoginSuccess = () => {} }) => {
     
     // For demo purposes, simulate successful login
     onLoginSuccess();
-    setTimeout(() => navigate("/onboarding"), 1500);
+    localStorage.setItem("isOnboarded", "true");
+    setTimeout(() => navigate("/dashboard"), 1500);
   };
 
   return (

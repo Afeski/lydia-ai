@@ -45,14 +45,27 @@ const ProtectedRoute = ({
     return <Navigate to={redirectTo} />;
   }
   
-  // If user is authenticated but not onboarded and onboarding is required
+  // If user is authenticated but not onboarded and onboarding is required for new users
   if (requiresAuth && isAuthenticated && requiresOnboarding && !isOnboarded) {
-    return <Navigate to="/onboarding" />;
+    const email = user?.email;
+    const userMetadata = user?.user_metadata;
+    
+    // Check if this is a new user who needs onboarding
+    // We consider a user new if they don't have the isOnboarded flag in localStorage
+    // and they don't have any user metadata that would indicate they've been here before
+    const isNewUser = !isOnboarded && (!userMetadata || Object.keys(userMetadata).length === 0);
+    
+    if (isNewUser) {
+      return <Navigate to="/onboarding" />;
+    }
+    
+    // If not a new user but not onboarded yet, just mark them as onboarded and continue
+    localStorage.setItem("isOnboarded", "true");
   }
   
   // If user is already authenticated and trying to access login/signup
   if (!requiresAuth && isAuthenticated) {
-    return <Navigate to={isOnboarded ? "/dashboard" : "/onboarding"} />;
+    return <Navigate to="/dashboard" />;
   }
   
   return children;

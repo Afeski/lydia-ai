@@ -82,7 +82,8 @@ const SignUp = ({ onSignUpSuccess = () => {} }) => {
       // Call the signup success callback
       onSignUpSuccess();
       
-      // Redirect to onboarding
+      // For new users, we'll redirect to onboarding
+      // Don't set isOnboarded here, so they go through onboarding first
       setTimeout(() => navigate("/onboarding"), 1500);
     } catch (error) {
       console.error("Signup error:", error);

@@ -9,9 +9,13 @@ import {
   Pill, 
   Activity 
 } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const OnboardingPage = ({ onComplete = () => {} }) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [step, setStep] = useState(1);
   const [preferences, setPreferences] = useState({
     reminderFrequency: "daily",
@@ -22,12 +26,47 @@ const OnboardingPage = ({ onComplete = () => {} }) => {
 
   const totalSteps = 4;
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (step < totalSteps) {
       setStep(step + 1);
     } else {
-      onComplete();
-      navigate("/dashboard");
+      try {
+        if (user) {
+          const { error } = await supabase
+            .from('user_preferences')
+            .upsert({
+              user_id: user.id,
+              preferences: preferences
+            });
+            
+          if (error) throw error;
+        }
+        
+        localStorage.setItem("userPreferences", JSON.stringify(preferences));
+        
+        localStorage.setItem("isOnboarded", "true");
+        
+        toast({
+          title: "Setup complete!",
+          description: "Your preferences have been saved.",
+        });
+        
+        onComplete();
+        navigate("/dashboard");
+      } catch (error) {
+        console.error("Error saving preferences:", error);
+        
+        localStorage.setItem("isOnboarded", "true");
+        
+        toast({
+          title: "Warning",
+          description: "Your preferences were saved locally, but we couldn't save them to your profile.",
+          variant: "destructive",
+        });
+        
+        onComplete();
+        navigate("/dashboard");
+      }
     }
   };
 
