@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -22,12 +23,14 @@ import {
   CalendarCheck,
   Pill,
   ChevronRight,
-  Search,
-  Mic,
-  MicOff
+  Search
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
+import AudioWaveform from "@/components/AudioWaveform";
+import SymptomChecker from "@/components/SymptomChecker";
+import AppointmentManager from "@/components/AppointmentManager";
+import { useSupabaseClient } from "@supabase/supabase-js";
 
 const userData = {
   name: "John Doe",
@@ -44,6 +47,7 @@ const userData = {
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const supabase = useSupabaseClient();
   const { signOut } = useAuth();
   const [activeChat, setActiveChat] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -52,9 +56,15 @@ const Dashboard = () => {
   ]);
   const [userInput, setUserInput] = useState("");
   const [isRecording, setIsRecording] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const [isAIProcessing, setIsAIProcessing] = useState(false);
+  const [showSymptomChecker, setShowSymptomChecker] = useState(false);
+  const [showAppointmentManager, setShowAppointmentManager] = useState(false);
+  const [appointments, setAppointments] = useState(userData.upcomingAppointments);
+  
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const handleLogout = async () => {
     try {
@@ -89,22 +99,14 @@ const Dashboard = () => {
     setMessages(prev => [...prev, newUserMessage]);
     setUserInput("");
     
-    // Process with Gemini
+    // Process with AI
     setIsAIProcessing(true);
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ message: userInput })
+      const { data, error } = await supabase.functions.invoke("chat", {
+        body: { message: userInput }
       });
       
-      if (!response.ok) {
-        throw new Error("Failed to get AI response");
-      }
-      
-      const data = await response.json();
+      if (error) throw new Error("Failed to get AI response");
       
       // Add AI response
       const aiResponse = {
@@ -152,19 +154,14 @@ const Dashboard = () => {
           
           // Get transcription
           try {
-            const response = await fetch("/api/transcribe", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({ audio: base64Audio })
+            const { data, error } = await supabase.functions.invoke("transcribe", {
+              body: { audio: base64Audio }
             });
             
-            if (!response.ok) {
+            if (error) {
               throw new Error("Failed to transcribe audio");
             }
             
-            const data = await response.json();
             setUserInput(data.text);
             
             // Automatically send the message after transcription
@@ -212,52 +209,43 @@ const Dashboard = () => {
 
   const convertToSpeech = async (text: string) => {
     try {
-      const response = await fetch("/api/text-to-speech", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ text })
+      setIsSpeaking(true);
+      const { data, error } = await supabase.functions.invoke("text-to-speech", {
+        body: { text, voice: "Lydia" }
       });
       
-      if (!response.ok) {
+      if (error) {
         throw new Error("Failed to convert text to speech");
       }
       
-      const data = await response.json();
       const audioContent = data.audioContent;
       
       // Play the audio
       const audio = new Audio(`data:audio/mpeg;base64,${audioContent}`);
+      audio.onended = () => setIsSpeaking(false);
       audio.play();
     } catch (error) {
       console.error("Text-to-speech error:", error);
+      setIsSpeaking(false);
     }
   };
 
   const startSymptomAssessment = () => {
-    setActiveChat(true);
-    const systemMessage = {
-      id: messages.length + 1,
-      sender: "system",
-      text: "Let's check your symptoms. Can you describe what you're experiencing?",
-      time: "Just now"
-    };
-    
-    setMessages([...messages, systemMessage]);
+    setShowSymptomChecker(true);
   };
 
   const scheduleAppointment = () => {
-    setActiveChat(true);
-    const systemMessage = {
-      id: messages.length + 1,
-      sender: "system",
-      text: "I'd be happy to help you schedule an appointment. What type of doctor would you like to see?",
-      time: "Just now"
-    };
-    
-    setMessages([...messages, systemMessage]);
+    setShowAppointmentManager(true);
   };
+
+  const handleNewAppointment = (appointment: any) => {
+    setAppointments(prev => [appointment, ...prev]);
+  };
+
+  // Scroll to bottom of messages when new messages are added
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -282,7 +270,7 @@ const Dashboard = () => {
         </div>
       </header>
 
-      <div className="dashboard-container grid grid-cols-1 lg:grid-cols-3 gap-6 py-6">
+      <div className="dashboard-container grid grid-cols-1 lg:grid-cols-3 gap-6 py-6 px-4">
         <div className="lg:col-span-1 space-y-6">
           <Card className="animate-fade-in">
             <CardHeader className="pb-2">
@@ -296,7 +284,7 @@ const Dashboard = () => {
                   <Calendar className="h-5 w-5 text-[#CB48B7]" />
                   <div>
                     <p className="text-sm font-medium">Next appointment</p>
-                    <p className="text-xs text-gray-500">{userData.upcomingAppointments[0].date} at {userData.upcomingAppointments[0].time}</p>
+                    <p className="text-xs text-gray-500">{appointments[0]?.date} at {appointments[0]?.time}</p>
                   </div>
                 </div>
                 
@@ -362,7 +350,7 @@ const Dashboard = () => {
             
             <CardContent>
               <div className="space-y-3">
-                {userData.upcomingAppointments.map((appointment) => (
+                {appointments.map((appointment) => (
                   <div key={appointment.id} className="p-3 border rounded-lg hover:border-[#CB48B7] transition-all cursor-pointer">
                     <div className="flex justify-between items-start">
                       <div>
@@ -381,7 +369,11 @@ const Dashboard = () => {
             </CardContent>
             
             <CardFooter>
-              <Button variant="outline" className="w-full text-[#301A4B]">
+              <Button 
+                variant="outline" 
+                className="w-full text-[#301A4B]"
+                onClick={scheduleAppointment}
+              >
                 <Plus className="mr-2 h-4 w-4" /> Schedule New Appointment
               </Button>
             </CardFooter>
@@ -421,6 +413,7 @@ const Dashboard = () => {
                     </div>
                   </div>
                 ))}
+                <div ref={messagesEndRef} />
               </div>
             </CardContent>
             
@@ -442,16 +435,18 @@ const Dashboard = () => {
                   type="button" 
                   variant="outline"
                   onClick={isRecording ? stopRecording : startRecording}
-                  className={`${isRecording ? 'bg-red-100 text-red-600 border-red-300' : ''}`}
-                  disabled={isAIProcessing}
+                  className={`${isRecording ? 'bg-red-100 text-red-600 border-red-300' : ''} relative`}
+                  disabled={isAIProcessing || isSpeaking}
                 >
-                  {isRecording ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+                  <div className="h-5 w-5 flex items-center justify-center">
+                    <AudioWaveform isRecording={isRecording} isSpeaking={isSpeaking} />
+                  </div>
                 </Button>
                 
                 <Button 
                   type="submit" 
                   className="bg-[#301A4B] hover:bg-[#301A4B]/90"
-                  disabled={isRecording || isAIProcessing || (!userInput.trim() && !isRecording)}
+                  disabled={isRecording || isAIProcessing || isSpeaking || (!userInput.trim() && !isRecording)}
                 >
                   Send
                 </Button>
@@ -460,6 +455,18 @@ const Dashboard = () => {
           </Card>
         </div>
       </div>
+
+      {/* Feature Modals */}
+      <SymptomChecker 
+        open={showSymptomChecker} 
+        onOpenChange={setShowSymptomChecker} 
+      />
+      
+      <AppointmentManager 
+        open={showAppointmentManager} 
+        onOpenChange={setShowAppointmentManager} 
+        onAppointmentBooked={handleNewAppointment}
+      />
     </div>
   );
 };
