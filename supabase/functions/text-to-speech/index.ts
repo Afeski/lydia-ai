@@ -26,11 +26,12 @@ serve(async (req) => {
     // Map the voice name to an ElevenLabs voice ID
     const voiceIds = {
       "Emily": "EXAVITQu4vr4xnSDxMaL",
-      "Lydia": "pFZP5JQG7iQjIQuC4Bku", // Using Lily's voice ID for Lydia
-      "Default": "EXAVITQu4vr4xnSDxMaL" // Sarah as fallback 
+      "Lydia": "pFZP5JQG7iQjIQuC4Bku", 
+      "Default": "EXAVITQu4vr4xnSDxMaL"
     };
     
     const voiceId = voiceIds[voice] || voiceIds.Default;
+    console.log("Using voice ID:", voiceId, "for voice:", voice);
 
     // Use ElevenLabs API to convert text to speech
     const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
