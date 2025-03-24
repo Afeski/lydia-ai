@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -13,11 +14,19 @@ import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
+// Define the preferences type to avoid TypeScript errors
+type UserPreferences = {
+  reminderFrequency: string;
+  preferredDoctorType: string[];
+  healthGoals: string[];
+  chronicConditions: string[];
+};
+
 const OnboardingPage = ({ onComplete = () => {} }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [step, setStep] = useState(1);
-  const [preferences, setPreferences] = useState({
+  const [preferences, setPreferences] = useState<UserPreferences>({
     reminderFrequency: "daily",
     preferredDoctorType: [],
     healthGoals: [],
@@ -32,12 +41,13 @@ const OnboardingPage = ({ onComplete = () => {} }) => {
     } else {
       try {
         if (user) {
+          // Use type assertion to safely use the Supabase client with our table
           const { error } = await supabase
             .from('user_preferences')
             .upsert({
               user_id: user.id,
               preferences: preferences
-            });
+            } as any);
             
           if (error) throw error;
         }
