@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -45,13 +46,24 @@ const userData = {
   ]
 };
 
+// Helper function to format current time
+const formatTime = () => {
+  const now = new Date();
+  let hours = now.getHours();
+  const minutes = now.getMinutes().toString().padStart(2, '0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // Handle midnight (0 hours)
+  return `${hours}:${minutes} ${ampm}`;
+};
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const { signOut } = useAuth();
   const [activeChat, setActiveChat] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [messages, setMessages] = useState([
-    { id: 1, sender: "system", text: "Hello! I'm Lydia, your AI health assistant. How can I help you today?", time: "Just now" }
+    { id: 1, sender: "system", text: "Hello! I'm Lydia, your AI health assistant. How can I help you today?", time: formatTime() }
   ]);
   const [userInput, setUserInput] = useState("");
   const [isRecording, setIsRecording] = useState(false);
@@ -92,7 +104,7 @@ const Dashboard = () => {
       id: messages.length + 1,
       sender: "user",
       text: userInput,
-      time: "Just now"
+      time: formatTime()
     };
     
     setMessages(prev => [...prev, newUserMessage]);
@@ -104,13 +116,16 @@ const Dashboard = () => {
         body: { message: userInput }
       });
       
-      if (error) throw new Error("Failed to get AI response");
+      if (error) {
+        console.error("Chat error from Supabase:", error);
+        throw new Error("Failed to get AI response");
+      }
       
       const aiResponse = {
         id: messages.length + 2,
         sender: "system",
         text: data.response || "I can help you with that! Would you like me to check your symptoms or schedule an appointment with a doctor?",
-        time: "Just now"
+        time: formatTime()
       };
       
       setMessages(prev => [...prev, aiResponse]);
@@ -154,18 +169,25 @@ const Dashboard = () => {
         const reader = new FileReader();
         reader.readAsDataURL(audioBlob);
         reader.onloadend = async () => {
-          const base64Audio = reader.result?.toString().split(',')[1] || '';
-          
-          setIsListening(false);
-          setIsAIProcessing(true);
-          
           try {
+            const base64Audio = reader.result?.toString().split(',')[1] || '';
+            
+            setIsListening(false);
+            setIsAIProcessing(true);
+            
+            console.log("Sending audio data to transcribe function");
             const { data, error } = await supabase.functions.invoke("transcribe", {
               body: { audio: base64Audio }
             });
             
             if (error) {
+              console.error("Transcription error from Supabase:", error);
               throw new Error("Failed to transcribe audio");
+            }
+            
+            console.log("Received transcription:", data);
+            if (!data || !data.text) {
+              throw new Error("No transcription text received");
             }
             
             setUserInput(data.text);

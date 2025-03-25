@@ -18,13 +18,14 @@ serve(async (req) => {
       throw new Error('Message is required')
     }
 
-    // Use the API key directly for testing (will be replaced by env variable in production)
-    const ELEVEN_LABS_API_KEY = Deno.env.get('ELEVEN_LABS_API_KEY') || "sk_9689a8ee9401aa35d530f4a47ca9db5d50fcba021aef29bb"
-    const VOICE_ID = voice_id || "kVWRcvZrI3hlHgA90ED7" // Default to Lydia's voice ID
-
+    // Use the environment variable for the API key
+    const ELEVEN_LABS_API_KEY = Deno.env.get('ELEVEN_LABS_API_KEY')
     if (!ELEVEN_LABS_API_KEY) {
+      console.error("Missing Eleven Labs API key in environment")
       throw new Error('ElevenLabs API key is not configured')
     }
+    
+    const VOICE_ID = voice_id || "kVWRcvZrI3hlHgA90ED7" // Default to Lydia's voice ID
 
     console.log("Using voice ID:", VOICE_ID, "for message:", message.substring(0, 50) + "...")
     console.log("API Key used (first 5 chars):", ELEVEN_LABS_API_KEY.substring(0, 5))

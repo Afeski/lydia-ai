@@ -1,9 +1,11 @@
+
 import React, { useState } from "react";
 import { Building, Handshake, HeartPulse, BarChart3, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
+
 const PartnershipSection = () => {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -14,16 +16,15 @@ const PartnershipSection = () => {
     partnershipType: "",
     message: ""
   });
+
   const handleChange = e => {
-    const {
-      name,
-      value
-    } = e.target;
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
   };
+
   const handleSubmit = e => {
     e.preventDefault();
     // Here you would typically send this data to your backend
@@ -42,6 +43,7 @@ const PartnershipSection = () => {
       message: ""
     });
   };
+
   return <section id="partnerships" className="section-container bg-lydia-navy text-white bg-[t] bg-[#301a4b]">
       <div className="text-center mb-16">
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">Looking for Partnerships</h2>
@@ -202,4 +204,5 @@ const PartnershipSection = () => {
         </div>}
     </section>;
 };
+
 export default PartnershipSection;

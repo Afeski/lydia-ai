@@ -18,48 +18,51 @@ serve(async (req) => {
       throw new Error('Message is required')
     }
 
-    const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || 'AIzaSyCqZU3HoSd5yaCu2GbiJjt28mUR7VaISAg'
+    const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY')
     
-    // Send to Gemini API using the correct endpoint for Gemini 2.0
-    const response = await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-latest:generateContent?key=' + GEMINI_API_KEY, {
+    if (!ANTHROPIC_API_KEY) {
+      throw new Error('Anthropic API key is not configured')
+    }
+    
+    console.log("Sending message to Anthropic Claude:", message.substring(0, 50) + "...")
+    
+    // Send to Anthropic Claude API
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'x-api-key': ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        contents: [
+        model: "claude-3-opus-20240229",
+        max_tokens: 1000,
+        messages: [
           {
-            parts: [
-              {
-                text: `You are Lydia, a caring healthcare assistant with these characteristics:
-                - Kind, nurturing, and empathetic in your tone
-                - Focused on providing healthcare guidance and support
-                - Expert at understanding symptoms and suggesting appropriate care
-                - Helpful with scheduling doctor appointments
-                - Always respectful of medical boundaries (not providing diagnosis)
-                
-                The user will describe their health concerns or needs. Respond with care and empathy while providing helpful guidance.
-                
-                User message: ${message}`
-              }
-            ]
+            role: "user",
+            content: `You are Lydia, a caring healthcare assistant with these characteristics:
+            - Kind, nurturing, and empathetic in your tone
+            - Focused on providing healthcare guidance and support
+            - Expert at understanding symptoms and suggesting appropriate care
+            - Helpful with scheduling doctor appointments
+            - Always respectful of medical boundaries (not providing diagnosis)
+            
+            The user will describe their health concerns or needs. Respond with care and empathy while providing helpful guidance.
+            
+            User message: ${message}`
           }
-        ],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 800,
-        }
+        ]
       }),
     })
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error("Gemini API error:", errorText)
-      throw new Error(`Gemini API error: ${errorText}`)
+      console.error("Anthropic API error:", errorText)
+      throw new Error(`Anthropic API error: ${errorText}`)
     }
 
     const data = await response.json()
-    const generatedText = data.candidates[0].content.parts[0].text
+    const generatedText = data.content[0].text
 
     return new Response(
       JSON.stringify({ response: generatedText }),
