@@ -133,7 +133,7 @@ const PartnershipSection = () => {
       </div>
 
       <div className="text-center animate-fade-in">
-        <Button onClick={() => setShowForm(true)} className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-lydia-skyblue text-lydia-navy font-semibold rounded-lg hover:bg-lydia-skyblue/90 transition-all duration-300">
+        <Button onClick={() => setShowForm(true)} className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-lydia-skyblue text-lydia-navy font-semibold rounded-lg hover:bg-lydia-skyblue/90 transition-all duration-300 bg-[t] bg-white">
           Become a Partner
         </Button>
       </div>
