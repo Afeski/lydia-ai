@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 import { fontFamily } from "tailwindcss/defaultTheme";
 import tailwindAnimate from "tailwindcss-animate";
@@ -57,6 +58,9 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Add the custom Lydia colors
+        "lydia-skyblue": "#33C3F0",
+        "lydia-lavender": "#E6E6FA",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -83,6 +87,7 @@ const config: Config = {
         "ping-slow": "ping-slow 1.5s cubic-bezier(0, 0, 0.2, 1) infinite",
         "fade-in": "fade-in 0.5s ease-in-out forwards",
         "scale-in": "scale-in 0.3s ease-in-out forwards",
+        "pulse-soft": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
     },
   },
