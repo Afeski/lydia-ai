@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -23,11 +22,12 @@ import {
   CalendarCheck,
   Pill,
   ChevronRight,
-  Search
+  Search,
+  AudioWaveform
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
-import AudioWaveform from "@/components/AudioWaveform";
+import AudioWaveformComponent from "@/components/AudioWaveform";
 import SymptomChecker from "@/components/SymptomChecker";
 import AppointmentManager from "@/components/AppointmentManager";
 import { useSupabaseClient } from "@supabase/supabase-js";
@@ -58,6 +58,7 @@ const Dashboard = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isAIProcessing, setIsAIProcessing] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const [showSymptomChecker, setShowSymptomChecker] = useState(false);
   const [showAppointmentManager, setShowAppointmentManager] = useState(false);
   const [appointments, setAppointments] = useState(userData.upcomingAppointments);
@@ -88,7 +89,6 @@ const Dashboard = () => {
     e.preventDefault();
     if (!userInput.trim() && !isRecording) return;
     
-    // Add user message
     const newUserMessage = {
       id: messages.length + 1,
       sender: "user",
@@ -99,7 +99,6 @@ const Dashboard = () => {
     setMessages(prev => [...prev, newUserMessage]);
     setUserInput("");
     
-    // Process with AI
     setIsAIProcessing(true);
     try {
       const { data, error } = await supabase.functions.invoke("chat", {
@@ -108,7 +107,6 @@ const Dashboard = () => {
       
       if (error) throw new Error("Failed to get AI response");
       
-      // Add AI response
       const aiResponse = {
         id: messages.length + 2,
         sender: "system",
@@ -118,7 +116,6 @@ const Dashboard = () => {
       
       setMessages(prev => [...prev, aiResponse]);
       
-      // Convert to speech
       await convertToSpeech(aiResponse.text);
     } catch (error) {
       console.error("Error processing message:", error);
@@ -129,6 +126,14 @@ const Dashboard = () => {
       });
     } finally {
       setIsAIProcessing(false);
+    }
+  };
+
+  const toggleVoiceConversation = async () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      await startRecording();
     }
   };
 
@@ -152,43 +157,35 @@ const Dashboard = () => {
         reader.onloadend = async () => {
           const base64Audio = reader.result?.toString().split(',')[1] || '';
           
-          // Get transcription
-          try {
-            const { data, error } = await supabase.functions.invoke("transcribe", {
-              body: { audio: base64Audio }
-            });
-            
-            if (error) {
-              throw new Error("Failed to transcribe audio");
-            }
-            
-            setUserInput(data.text);
-            
-            // Automatically send the message after transcription
-            setTimeout(() => {
-              const fakeEvent = { preventDefault: () => {} } as React.FormEvent;
-              handleSendMessage(fakeEvent);
-            }, 500);
-          } catch (error) {
-            console.error("Transcription error:", error);
-            toast({
-              title: "Transcription failed",
-              description: "Could not convert your speech to text. Please try again.",
-              variant: "destructive"
-            });
+          setIsListening(false);
+          setIsAIProcessing(true);
+          
+          const { data, error } = await supabase.functions.invoke("transcribe", {
+            body: { audio: base64Audio }
+          });
+          
+          if (error) {
+            throw new Error("Failed to transcribe audio");
           }
+          
+          setUserInput(data.text);
+          
+          setTimeout(() => {
+            const fakeEvent = { preventDefault: () => {} } as React.FormEvent;
+            handleSendMessage(fakeEvent);
+          }, 500);
         };
         
-        // Close audio tracks
         stream.getTracks().forEach(track => track.stop());
       };
       
       mediaRecorder.start();
       setIsRecording(true);
+      setIsListening(true);
       
       toast({
-        title: "Recording",
-        description: "I'm listening to you now. Speak clearly.",
+        title: "Listening",
+        description: "Lydia is listening. Speak clearly and I'll respond.",
       });
     } catch (error) {
       console.error("Recording error:", error);
@@ -210,17 +207,16 @@ const Dashboard = () => {
   const convertToSpeech = async (text: string) => {
     try {
       setIsSpeaking(true);
-      const { data, error } = await supabase.functions.invoke("text-to-speech", {
-        body: { text, voice: "Lydia" }
+      const { data, error } = await supabase.functions.invoke("eleven-labs-voice", {
+        body: { message: text, voice_id: "kVWRcvZrI3hlHgA90ED7" }
       });
       
       if (error) {
         throw new Error("Failed to convert text to speech");
       }
       
-      const audioContent = data.audioContent;
+      const audioContent = data.audio;
       
-      // Play the audio
       const audio = new Audio(`data:audio/mpeg;base64,${audioContent}`);
       audio.onended = () => setIsSpeaking(false);
       audio.play();
@@ -242,7 +238,6 @@ const Dashboard = () => {
     setAppointments(prev => [appointment, ...prev]);
   };
 
-  // Scroll to bottom of messages when new messages are added
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -422,7 +417,7 @@ const Dashboard = () => {
                 <div className="relative flex-grow">
                   <input
                     type="text"
-                    placeholder="Type your message..."
+                    placeholder={isListening ? "Listening..." : "Type your message..."}
                     className="w-full p-3 pr-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CB48B7] focus:border-transparent"
                     value={userInput}
                     onChange={(e) => setUserInput(e.target.value)}
@@ -434,12 +429,21 @@ const Dashboard = () => {
                 <Button 
                   type="button" 
                   variant="outline"
-                  onClick={isRecording ? stopRecording : startRecording}
-                  className={`${isRecording ? 'bg-red-100 text-red-600 border-red-300' : ''} relative`}
-                  disabled={isAIProcessing || isSpeaking}
+                  onClick={toggleVoiceConversation}
+                  className={`${
+                    isRecording || isListening 
+                      ? 'bg-red-100 text-red-600 border-red-300' 
+                      : isSpeaking 
+                        ? 'bg-purple-100 text-purple-600 border-purple-300'
+                        : ''
+                  } relative`}
+                  disabled={isAIProcessing}
                 >
                   <div className="h-5 w-5 flex items-center justify-center">
-                    <AudioWaveform isRecording={isRecording} isSpeaking={isSpeaking} />
+                    <AudioWaveformComponent 
+                      isRecording={isRecording} 
+                      isSpeaking={isSpeaking} 
+                    />
                   </div>
                 </Button>
                 
@@ -456,7 +460,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Feature Modals */}
       <SymptomChecker 
         open={showSymptomChecker} 
         onOpenChange={setShowSymptomChecker} 
