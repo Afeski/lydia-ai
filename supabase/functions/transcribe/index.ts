@@ -43,33 +43,35 @@ serve(async (req) => {
   }
 
   try {
-    const { audio } = await req.json()
+    const body = await req.json();
+    const { audio } = body;
     
     if (!audio) {
-      throw new Error('No audio data provided')
+      console.error("No audio data received");
+      throw new Error('No audio data provided');
     }
 
     // Get the OpenAI API key from environment
-    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY')
+    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
     
     if (!OPENAI_API_KEY) {
-      console.error("Missing OpenAI API key")
-      throw new Error('OpenAI API key is not configured')
+      console.error("Missing OpenAI API key");
+      throw new Error('OpenAI API key is not configured');
     }
 
-    console.log("Processing audio data of length:", audio.length)
+    console.log("Processing audio data of length:", audio.length);
     
     // Process audio in chunks
-    const binaryAudio = processBase64Chunks(audio)
-    console.log("Processed binary audio of size:", binaryAudio.length)
+    const binaryAudio = processBase64Chunks(audio);
+    console.log("Processed binary audio of size:", binaryAudio.length);
     
     // Prepare form data
-    const formData = new FormData()
-    const blob = new Blob([binaryAudio], { type: 'audio/webm' })
-    formData.append('file', blob, 'audio.webm')
-    formData.append('model', 'whisper-1')
+    const formData = new FormData();
+    const blob = new Blob([binaryAudio], { type: 'audio/webm' });
+    formData.append('file', blob, 'audio.webm');
+    formData.append('model', 'whisper-1');
 
-    console.log("Sending to OpenAI whisper API")
+    console.log("Sending to OpenAI whisper API");
     
     // Send to OpenAI
     const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
@@ -78,21 +80,21 @@ serve(async (req) => {
         'Authorization': `Bearer ${OPENAI_API_KEY}`,
       },
       body: formData,
-    })
+    });
 
     if (!response.ok) {
-      const errorText = await response.text()
-      console.error("OpenAI API error:", errorText)
-      throw new Error(`OpenAI API error: ${errorText}`)
+      const errorText = await response.text();
+      console.error("OpenAI API error:", errorText);
+      throw new Error(`OpenAI API error: ${errorText}`);
     }
 
-    const result = await response.json()
-    console.log("Received transcription:", result.text)
+    const result = await response.json();
+    console.log("Received transcription:", result.text);
 
     return new Response(
       JSON.stringify({ text: result.text }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
+    );
 
   } catch (error) {
     console.error("Transcription error:", error.message);
@@ -102,6 +104,6 @@ serve(async (req) => {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
-    )
+    );
   }
-})
+});

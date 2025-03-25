@@ -21,10 +21,12 @@ serve(async (req) => {
     const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY')
     
     if (!ANTHROPIC_API_KEY) {
+      console.error("Missing Anthropic API key")
       throw new Error('Anthropic API key is not configured')
     }
     
-    console.log("Sending message to Anthropic Claude:", message.substring(0, 50) + "...")
+    console.log("Using Anthropic API key (first 10 chars):", ANTHROPIC_API_KEY.substring(0, 10))
+    console.log("Processing message:", message.substring(0, 100))
     
     // Send to Anthropic Claude API
     const response = await fetch('https://api.anthropic.com/v1/messages', {

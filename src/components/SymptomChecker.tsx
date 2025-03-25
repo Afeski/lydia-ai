@@ -32,11 +32,20 @@ const SymptomChecker: React.FC<SymptomCheckerProps> = ({ open, onOpenChange }) =
     setResponse("");
 
     try {
+      console.log("Sending symptoms to symptom-check function:", symptoms.substring(0, 50) + "...");
+      
       const { data, error } = await supabase.functions.invoke("symptom-check", {
         body: { symptoms: symptoms.trim() }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error checking symptoms:", error);
+        throw error;
+      }
+
+      if (!data || !data.response) {
+        throw new Error("No response received from symptom checker");
+      }
 
       setResponse(data.response);
     } catch (error) {

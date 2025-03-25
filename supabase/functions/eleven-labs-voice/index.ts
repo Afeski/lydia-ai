@@ -18,20 +18,21 @@ serve(async (req) => {
       throw new Error('Message is required')
     }
 
-    // Use the environment variable for the API key
+    // Get API key from environment variables
     const ELEVEN_LABS_API_KEY = Deno.env.get('ELEVEN_LABS_API_KEY')
     if (!ELEVEN_LABS_API_KEY) {
       console.error("Missing Eleven Labs API key in environment")
       throw new Error('ElevenLabs API key is not configured')
     }
     
-    const VOICE_ID = voice_id || "kVWRcvZrI3hlHgA90ED7" // Default to Lydia's voice ID
+    // Use provided voice ID or default to Lydia's voice
+    const VOICE_ID = voice_id || "pFZP5JQG7iQjIQuC4Bku" // Lydia's voice ID
 
-    console.log("Using voice ID:", VOICE_ID, "for message:", message.substring(0, 50) + "...")
-    console.log("API Key used (first 5 chars):", ELEVEN_LABS_API_KEY.substring(0, 5))
+    console.log(`Using voice ID: ${VOICE_ID.substring(0, 10)}... for message: ${message.substring(0, 50)}...`)
+    console.log(`API Key detected (first 5 chars): ${ELEVEN_LABS_API_KEY.substring(0, 5)}`)
 
     // Call ElevenLabs Speech API
-    const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}/stream`, {
+    const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`, {
       method: 'POST',
       headers: {
         'Accept': 'audio/mpeg',
