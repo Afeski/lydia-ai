@@ -58,9 +58,10 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Add the custom Lydia colors
+        // Custom Lydia colors
         "lydia-skyblue": "#33C3F0",
         "lydia-lavender": "#E6E6FA",
+        "lydia-navy": "#301A4B",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -79,6 +80,14 @@ const config: Config = {
         "ping-slow": {
           '0%': { transform: 'scale(1)', opacity: '0.8' },
           '100%': { transform: 'scale(2)', opacity: '0' },
+        },
+        "fade-in": {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        "scale-in": {
+          '0%': { opacity: '0', transform: 'scale(0.9)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
         },
       },
       animation: {
