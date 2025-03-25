@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ThermometerSnowflake, Loader2 } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { toast } from "@/hooks/use-toast";
-import { useSupabaseClient } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SymptomCheckerProps {
   open: boolean;
@@ -16,7 +16,6 @@ const SymptomChecker: React.FC<SymptomCheckerProps> = ({ open, onOpenChange }) =
   const [symptoms, setSymptoms] = useState("");
   const [response, setResponse] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const supabase = useSupabaseClient();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

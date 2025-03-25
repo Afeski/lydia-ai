@@ -30,7 +30,7 @@ import { toast } from "@/hooks/use-toast";
 import AudioWaveformComponent from "@/components/AudioWaveform";
 import SymptomChecker from "@/components/SymptomChecker";
 import AppointmentManager from "@/components/AppointmentManager";
-import { useSupabaseClient } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
 
 const userData = {
   name: "John Doe",
@@ -47,7 +47,6 @@ const userData = {
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const supabase = useSupabaseClient();
   const { signOut } = useAuth();
   const [activeChat, setActiveChat] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
