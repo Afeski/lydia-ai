@@ -23,7 +23,6 @@ import {
   Pill,
   ChevronRight,
   Search,
-  AudioWaveform
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
@@ -31,6 +30,7 @@ import AudioWaveformComponent from "@/components/AudioWaveform";
 import SymptomChecker from "@/components/SymptomChecker";
 import AppointmentManager from "@/components/AppointmentManager";
 import { supabase } from "@/integrations/supabase/client";
+import MicrophoneWithWaves from "@/components/MicrophoneWithWaves";
 
 const userData = {
   name: "John Doe",
@@ -159,20 +159,30 @@ const Dashboard = () => {
           setIsListening(false);
           setIsAIProcessing(true);
           
-          const { data, error } = await supabase.functions.invoke("transcribe", {
-            body: { audio: base64Audio }
-          });
-          
-          if (error) {
-            throw new Error("Failed to transcribe audio");
+          try {
+            const { data, error } = await supabase.functions.invoke("transcribe", {
+              body: { audio: base64Audio }
+            });
+            
+            if (error) {
+              throw new Error("Failed to transcribe audio");
+            }
+            
+            setUserInput(data.text);
+            
+            setTimeout(() => {
+              const fakeEvent = { preventDefault: () => {} } as React.FormEvent;
+              handleSendMessage(fakeEvent);
+            }, 500);
+          } catch (error) {
+            console.error("Transcription error:", error);
+            toast({
+              title: "Transcription error",
+              description: "Could not understand audio. Please try again.",
+              variant: "destructive"
+            });
+            setIsAIProcessing(false);
           }
-          
-          setUserInput(data.text);
-          
-          setTimeout(() => {
-            const fakeEvent = { preventDefault: () => {} } as React.FormEvent;
-            handleSendMessage(fakeEvent);
-          }, 500);
         };
         
         stream.getTracks().forEach(track => track.stop());
@@ -206,21 +216,39 @@ const Dashboard = () => {
   const convertToSpeech = async (text: string) => {
     try {
       setIsSpeaking(true);
+      console.log("Sending text to eleven-labs-voice:", text.substring(0, 30) + "...");
+      
       const { data, error } = await supabase.functions.invoke("eleven-labs-voice", {
         body: { message: text, voice_id: "kVWRcvZrI3hlHgA90ED7" }
       });
       
       if (error) {
+        console.error("Eleven Labs error:", error);
         throw new Error("Failed to convert text to speech");
       }
       
+      if (!data || !data.audio) {
+        console.error("No audio data received from Eleven Labs");
+        throw new Error("No audio data received");
+      }
+      
       const audioContent = data.audio;
+      console.log("Audio received, length:", audioContent.length);
       
       const audio = new Audio(`data:audio/mpeg;base64,${audioContent}`);
       audio.onended = () => setIsSpeaking(false);
-      audio.play();
+      audio.onerror = (e) => {
+        console.error("Audio playback error:", e);
+        setIsSpeaking(false);
+      };
+      await audio.play();
     } catch (error) {
       console.error("Text-to-speech error:", error);
+      toast({
+        title: "Voice error",
+        description: "Could not convert text to speech. Using text only.",
+        variant: "destructive"
+      });
       setIsSpeaking(false);
     }
   };
@@ -430,7 +458,7 @@ const Dashboard = () => {
                   variant="outline"
                   onClick={toggleVoiceConversation}
                   className={`${
-                    isRecording || isListening 
+                    isRecording 
                       ? 'bg-red-100 text-red-600 border-red-300' 
                       : isSpeaking 
                         ? 'bg-purple-100 text-purple-600 border-purple-300'
@@ -438,12 +466,10 @@ const Dashboard = () => {
                   } relative`}
                   disabled={isAIProcessing}
                 >
-                  <div className="h-5 w-5 flex items-center justify-center">
-                    <AudioWaveformComponent 
-                      isRecording={isRecording} 
-                      isSpeaking={isSpeaking} 
-                    />
-                  </div>
+                  <MicrophoneWithWaves 
+                    isRecording={isRecording} 
+                    isSpeaking={isSpeaking} 
+                  />
                 </Button>
                 
                 <Button 
