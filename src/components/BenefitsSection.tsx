@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Clock, Heart, Brain } from "lucide-react";
+import { Clock, Heart } from "lucide-react";
 import { Button } from "./ui/button";
 
 const benefits = [{
@@ -12,7 +12,7 @@ const benefits = [{
   title: "Better Health Outcomes",
   description: "Stay on top of your medication schedule and treatment plans with smart reminders that help ensure you never miss a dose."
 }, {
-  icon: <Brain className="w-6 h-6" />,
+  icon: <img src="/lovable-uploads/770ddcc8-9941-462b-8969-a3a83e9fee1f.png" className="w-6 h-6" alt="Health Report" />,
   title: "AI-Powered Insights",
   description: "Our advanced AI analyzes your symptoms and health data to provide personalized insights and recommendations."
 }];
@@ -44,7 +44,14 @@ const BenefitsSection = () => {
           ))}
           
           <div className="mt-8">
-            <Button variant="default" className="btn-primary">Experience the Benefits</Button>
+            <Button 
+              variant="default" 
+              className="px-6 py-3 rounded-md bg-[#301A4B] text-white font-medium
+                      transition-all duration-300 hover:bg-[#301A4B]/90 hover:shadow-md
+                      focus:outline-none focus:ring-2 focus:ring-[#E6E6FA] focus:ring-offset-2"
+            >
+              Get Started
+            </Button>
           </div>
         </div>
         
