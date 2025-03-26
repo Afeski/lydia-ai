@@ -28,7 +28,7 @@ const BenefitsSection = () => {
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8 items-center">
-        <div className="w-full lg:w-1/2 space-y-8">
+        <div className="w-full lg:w-1/2 space-y-4">
           {benefits.map((benefit, index) => (
             <div key={index} className="flex items-start gap-4 p-6 rounded-xl">
               <div className="w-14 h-14 rounded-full bg-[#E6E6FA] flex items-center justify-center shrink-0 text-[#301A4B]">
@@ -42,17 +42,6 @@ const BenefitsSection = () => {
               </div>
             </div>
           ))}
-          
-          <div className="mt-8 flex justify-center">
-            <Button 
-              variant="default" 
-              className="px-6 py-3 rounded-md bg-[#301A4B] text-white font-medium
-                      transition-all duration-300 hover:bg-[#301A4B]/90 hover:shadow-md
-                      focus:outline-none focus:ring-2 focus:ring-[#E6E6FA] focus:ring-offset-2"
-            >
-              Experience the Benefits
-            </Button>
-          </div>
         </div>
         
         <div className="w-full lg:w-1/2 mt-8 lg:mt-0">
@@ -62,6 +51,18 @@ const BenefitsSection = () => {
             className="w-full h-auto rounded-xl" 
           />
         </div>
+      </div>
+
+      <div className="mt-12 flex justify-center">
+        <Button 
+          variant="default" 
+          size="lg"
+          className="px-8 py-6 text-base rounded-md bg-[#301A4B] text-white font-medium
+                  transition-all duration-300 hover:bg-[#301A4B]/90 hover:shadow-md
+                  focus:outline-none focus:ring-2 focus:ring-[#E6E6FA] focus:ring-offset-2"
+        >
+          Experience the Benefits
+        </Button>
       </div>
     </section>;
 };
