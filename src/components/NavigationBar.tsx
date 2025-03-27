@@ -18,6 +18,21 @@ const NavigationBar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Close menu when clicking outside
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.mobile-menu') && !target.closest('.menu-button')) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [isMobileMenuOpen]);
+
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
@@ -70,7 +85,7 @@ const NavigationBar = () => {
 
         {/* Mobile Menu Button */}
         <button
-          className="md:hidden text-white focus:outline-none"
+          className="md:hidden text-white focus:outline-none menu-button"
           onClick={toggleMobileMenu}
           aria-label="Toggle menu"
         >
@@ -81,10 +96,18 @@ const NavigationBar = () => {
       {/* Mobile Navigation Menu */}
       <div
         className={cn(
-          "fixed inset-0 bg-[#301A4B] z-40 flex flex-col pt-24 px-6 transform transition-transform duration-300 ease-in-out md:hidden",
+          "fixed inset-0 bg-[#301A4B] z-40 flex flex-col pt-24 px-6 transform transition-transform duration-300 ease-in-out md:hidden mobile-menu",
           isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
+        <button 
+          className="absolute right-6 top-6 text-white p-2"
+          onClick={() => setIsMobileMenuOpen(false)}
+          aria-label="Close menu"
+        >
+          <X size={24} />
+        </button>
+        
         <nav className="flex flex-col space-y-6">
           <a
             href="#how-it-works"

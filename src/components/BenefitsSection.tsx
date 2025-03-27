@@ -46,7 +46,7 @@ const BenefitsSection = () => {
         
         <div className="w-full lg:w-1/2 mt-8 lg:mt-0">
           <img 
-            src="/public/lovable-uploads/c7ad94b7-a2cc-42bf-9fca-15f90206bb6b.png" 
+            src="/lovable-uploads/c7ad94b7-a2cc-42bf-9fca-15f90206bb6b.png" 
             alt="Virtual healthcare consultation" 
             className="w-full h-auto rounded-xl" 
           />

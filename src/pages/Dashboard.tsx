@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -24,6 +23,8 @@ import {
   Pill,
   ChevronRight,
   Search,
+  MapPin,
+  Video,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
@@ -32,12 +33,42 @@ import SymptomChecker from "@/components/SymptomChecker";
 import AppointmentManager from "@/components/AppointmentManager";
 import { supabase } from "@/integrations/supabase/client";
 import MicrophoneWithWaves from "@/components/MicrophoneWithWaves";
+import DoctorDetail from "@/components/DoctorDetail";
 
 const userData = {
   name: "John Doe",
   upcomingAppointments: [
-    { id: 1, doctor: "Dr. Sarah Johnson", specialty: "Cardiologist", date: "May 15, 2023", time: "10:00 AM" },
-    { id: 2, doctor: "Dr. Michael Chen", specialty: "Primary Care", date: "June 2, 2023", time: "2:30 PM" }
+    { 
+      id: 1, 
+      doctor: "Dr. Sarah Johnson", 
+      specialty: "Cardiologist", 
+      date: "May 15, 2023", 
+      time: "10:00 AM",
+      appointmentType: "virtual",
+      bio: "Dr. Sarah Johnson is a board-certified cardiologist with over 15 years of experience in treating heart conditions. She specializes in preventive cardiology and heart disease management.",
+      patientCase: "Follow-up appointment for recent blood pressure concerns and medication adjustment."
+    },
+    { 
+      id: 2, 
+      doctor: "Dr. Michael Chen", 
+      specialty: "Primary Care", 
+      date: "June 2, 2023", 
+      time: "2:30 PM",
+      appointmentType: "in-person",
+      location: "Downtown Medical Clinic",
+      bio: "Dr. Michael Chen is a family medicine physician dedicated to providing comprehensive healthcare for patients of all ages. He focuses on preventive care and managing chronic conditions.",
+      patientCase: "Annual physical examination and routine health screening."
+    },
+    { 
+      id: 3, 
+      doctor: "Dr. Emily Rodriguez", 
+      specialty: "Dermatologist", 
+      date: "June 10, 2023", 
+      time: "11:15 AM",
+      appointmentType: "virtual",
+      bio: "Dr. Emily Rodriguez is a dermatologist specializing in both medical and cosmetic dermatology. She has particular expertise in treating skin conditions like eczema, psoriasis, and acne.",
+      patientCase: "Follow-up on recent skin rash and evaluation of treatment effectiveness."
+    }
   ],
   medications: [
     { id: 1, name: "Lisinopril", dosage: "10mg", frequency: "Once daily", time: "8:00 AM", nextDose: "Today" },
@@ -46,7 +77,6 @@ const userData = {
   ]
 };
 
-// Helper function to format current time
 const formatTime = () => {
   const now = new Date();
   let hours = now.getHours();
@@ -73,6 +103,8 @@ const Dashboard = () => {
   const [showSymptomChecker, setShowSymptomChecker] = useState(false);
   const [showAppointmentManager, setShowAppointmentManager] = useState(false);
   const [appointments, setAppointments] = useState(userData.upcomingAppointments);
+  const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
+  const [showDoctorDetail, setShowDoctorDetail] = useState(false);
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -287,6 +319,11 @@ const Dashboard = () => {
     setAppointments(prev => [appointment, ...prev]);
   };
 
+  const openDoctorDetail = (doctor: any) => {
+    setSelectedDoctor(doctor);
+    setShowDoctorDetail(true);
+  };
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -387,35 +424,71 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="animate-fade-in" style={{ animationDelay: "0.2s" }}>
+          <Card className="animate-fade-in shadow-md border-[#CB48B7]/10" style={{ animationDelay: "0.2s" }}>
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl">Upcoming Appointments</CardTitle>
+              <CardTitle className="text-xl flex items-center">
+                <CalendarCheck className="mr-2 h-5 w-5 text-[#CB48B7]" />
+                Upcoming Appointments
+              </CardTitle>
             </CardHeader>
             
             <CardContent>
               <div className="space-y-3">
                 {appointments.map((appointment) => (
-                  <div key={appointment.id} className="p-3 border rounded-lg hover:border-[#CB48B7] transition-all cursor-pointer">
+                  <button
+                    key={appointment.id}
+                    className="w-full p-3 border rounded-lg hover:border-[#CB48B7] hover:shadow-md transition-all cursor-pointer bg-white"
+                    onClick={() => openDoctorDetail(appointment)}
+                  >
                     <div className="flex justify-between items-start">
-                      <div>
-                        <p className="font-medium">{appointment.doctor}</p>
-                        <p className="text-sm text-gray-500">{appointment.specialty}</p>
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-full bg-[#E6E6FA] flex items-center justify-center shrink-0 text-[#301A4B]">
+                          <User className="h-5 w-5" />
+                        </div>
+                        <div className="text-left">
+                          <p className="font-medium text-[#301A4B]">{appointment.doctor}</p>
+                          <p className="text-sm text-gray-500">{appointment.specialty}</p>
+                        </div>
                       </div>
-                      <ChevronRight className="h-5 w-5 text-gray-400" />
+                      <div className="flex flex-col items-end">
+                        <div className="px-2 py-1 rounded-full text-xs font-medium mb-1"
+                          style={{
+                            backgroundColor: appointment.appointmentType === 'virtual' ? '#e0f2fe' : '#f0fdf4',
+                            color: appointment.appointmentType === 'virtual' ? '#0369a1' : '#15803d'
+                          }}
+                        >
+                          {appointment.appointmentType === 'virtual' ? 'Virtual' : 'In-Person'}
+                        </div>
+                        <ChevronRight className="h-5 w-5 text-gray-400" />
+                      </div>
                     </div>
-                    <div className="mt-2 flex items-center gap-2 text-sm text-gray-500">
-                      <Calendar className="h-4 w-4" />
-                      <span>{appointment.date} • {appointment.time}</span>
+                    <div className="mt-2 flex items-center gap-3 text-sm text-gray-500">
+                      <div className="flex items-center">
+                        <Calendar className="h-4 w-4 mr-1" />
+                        <span>{appointment.date}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Clock className="h-4 w-4 mr-1" />
+                        <span>{appointment.time}</span>
+                      </div>
+                      <div className="flex items-center">
+                        {appointment.appointmentType === 'virtual' ? (
+                          <Video className="h-4 w-4 mr-1" />
+                        ) : (
+                          <MapPin className="h-4 w-4 mr-1" />
+                        )}
+                        <span>{appointment.appointmentType === 'virtual' ? 'Video Call' : appointment.location}</span>
+                      </div>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             </CardContent>
             
-            <CardFooter>
+            <CardFooter className="pt-2">
               <Button 
                 variant="outline" 
-                className="w-full text-[#301A4B]"
+                className="w-full text-[#301A4B] border-[#CB48B7]/30 hover:bg-[#CB48B7]/5"
                 onClick={scheduleAppointment}
               >
                 <Plus className="mr-2 h-4 w-4" /> Schedule New Appointment
@@ -517,6 +590,14 @@ const Dashboard = () => {
         onOpenChange={setShowAppointmentManager} 
         onAppointmentBooked={handleNewAppointment}
       />
+
+      {selectedDoctor && (
+        <DoctorDetail
+          open={showDoctorDetail}
+          onOpenChange={setShowDoctorDetail}
+          doctor={selectedDoctor}
+        />
+      )}
     </div>
   );
 };
