@@ -28,9 +28,9 @@ const BenefitsSection = () => {
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8 items-center">
-        <div className="w-full lg:w-1/2 space-y-4">
+        <div className="w-full lg:w-1/2 space-y-2">
           {benefits.map((benefit, index) => (
-            <div key={index} className="flex items-start gap-4 p-6 rounded-xl">
+            <div key={index} className="flex items-start gap-4 p-4 rounded-xl">
               <div className="w-14 h-14 rounded-full bg-[#E6E6FA] flex items-center justify-center shrink-0 text-[#301A4B]">
                 {benefit.icon}
               </div>
@@ -44,11 +44,11 @@ const BenefitsSection = () => {
           ))}
         </div>
         
-        <div className="w-full lg:w-1/2 mt-8 lg:mt-0">
+        <div className="w-full lg:w-1/2 mt-8 lg:mt-0 flex justify-center">
           <img 
             src="/lovable-uploads/c7ad94b7-a2cc-42bf-9fca-15f90206bb6b.png" 
             alt="Virtual healthcare consultation" 
-            className="w-full h-auto rounded-xl" 
+            className="w-full max-w-[500px] h-auto rounded-xl" 
           />
         </div>
       </div>
@@ -57,7 +57,7 @@ const BenefitsSection = () => {
         <Button 
           variant="default" 
           size="lg"
-          className="px-8 py-6 text-base rounded-md bg-[#301A4B] text-white font-medium
+          className="px-10 py-7 text-lg rounded-md bg-[#301A4B] text-white font-medium
                   transition-all duration-300 hover:bg-[#301A4B]/90 hover:shadow-md
                   focus:outline-none focus:ring-2 focus:ring-[#E6E6FA] focus:ring-offset-2"
         >

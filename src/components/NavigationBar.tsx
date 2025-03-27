@@ -85,7 +85,7 @@ const NavigationBar = () => {
 
         {/* Mobile Menu Button */}
         <button
-          className="md:hidden text-white focus:outline-none menu-button"
+          className="md:hidden text-white focus:outline-none menu-button z-50"
           onClick={toggleMobileMenu}
           aria-label="Toggle menu"
         >
