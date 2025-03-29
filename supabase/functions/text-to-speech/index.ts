@@ -12,19 +12,37 @@ serve(async (req) => {
   }
 
   try {
-    return new Response(
-      JSON.stringify({ 
-        message: "Text-to-speech functionality is currently unavailable.", 
-        status: "service_disabled" 
-      }),
+    const { message, voice_id } = await req.json()
+    
+    if (!message) {
+      throw new Error('Message is required')
+    }
+    
+    // Forward request to the eleven-labs-voice function
+    const elevenLabsResponse = await fetch(
+      `${req.url.replace('/text-to-speech', '/eleven-labs-voice')}`,
       {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message, voice_id }),
+      }
+    )
+    
+    const data = await elevenLabsResponse.json()
+    
+    return new Response(
+      JSON.stringify(data),
+      {
+        status: elevenLabsResponse.status,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       },
     )
   } catch (error) {
     console.error("Text-to-speech error:", error.message)
     return new Response(
-      JSON.stringify({ error: "Text-to-speech service is unavailable" }),
+      JSON.stringify({ error: "Text-to-speech service is unavailable", details: error.message }),
       {
         status: 503,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
