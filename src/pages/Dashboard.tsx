@@ -96,18 +96,12 @@ const Dashboard = () => {
     { id: 1, sender: "system", text: "Hello! I'm Lydia, your AI health assistant. How can I help you today?", time: formatTime() }
   ]);
   const [userInput, setUserInput] = useState("");
-  const [isRecording, setIsRecording] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const [isAIProcessing, setIsAIProcessing] = useState(false);
-  const [isListening, setIsListening] = useState(false);
   const [showSymptomChecker, setShowSymptomChecker] = useState(false);
   const [showAppointmentManager, setShowAppointmentManager] = useState(false);
   const [appointments, setAppointments] = useState(userData.upcomingAppointments);
   const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
   const [showDoctorDetail, setShowDoctorDetail] = useState(false);
   
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const handleLogout = async () => {
@@ -130,7 +124,7 @@ const Dashboard = () => {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userInput.trim() && !isRecording) return;
+    if (!userInput.trim()) return;
     
     const newUserMessage = {
       id: messages.length + 1,
@@ -142,7 +136,6 @@ const Dashboard = () => {
     setMessages(prev => [...prev, newUserMessage]);
     setUserInput("");
     
-    setIsAIProcessing(true);
     try {
       const { data, error } = await supabase.functions.invoke("chat", {
         body: { message: userInput }
@@ -161,8 +154,6 @@ const Dashboard = () => {
       };
       
       setMessages(prev => [...prev, aiResponse]);
-      
-      await convertToSpeech(aiResponse.text);
     } catch (error) {
       console.error("Error processing message:", error);
       toast({
@@ -170,143 +161,6 @@ const Dashboard = () => {
         description: "Failed to process your message. Please try again.",
         variant: "destructive"
       });
-    } finally {
-      setIsAIProcessing(false);
-    }
-  };
-
-  const toggleVoiceConversation = async () => {
-    if (isRecording) {
-      stopRecording();
-    } else {
-      await startRecording();
-    }
-  };
-
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
-      
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
-      };
-      
-      mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        const reader = new FileReader();
-        reader.readAsDataURL(audioBlob);
-        reader.onloadend = async () => {
-          try {
-            const base64Audio = reader.result?.toString().split(',')[1] || '';
-            
-            setIsListening(false);
-            setIsAIProcessing(true);
-            
-            console.log("Sending audio data to transcribe function");
-            const { data, error } = await supabase.functions.invoke("transcribe", {
-              body: { audio: base64Audio }
-            });
-            
-            if (error) {
-              console.error("Transcription error from Supabase:", error);
-              throw new Error("Failed to transcribe audio");
-            }
-            
-            console.log("Received transcription:", data);
-            if (!data || !data.text) {
-              throw new Error("No transcription text received");
-            }
-            
-            setUserInput(data.text);
-            
-            setTimeout(() => {
-              const fakeEvent = { preventDefault: () => {} } as React.FormEvent;
-              handleSendMessage(fakeEvent);
-            }, 500);
-          } catch (error) {
-            console.error("Transcription error:", error);
-            toast({
-              title: "Transcription error",
-              description: "Could not understand audio. Please try again.",
-              variant: "destructive"
-            });
-            setIsAIProcessing(false);
-          }
-        };
-        
-        stream.getTracks().forEach(track => track.stop());
-      };
-      
-      mediaRecorder.start();
-      setIsRecording(true);
-      setIsListening(true);
-      
-      toast({
-        title: "Listening",
-        description: "Lydia is listening. Speak clearly and I'll respond.",
-      });
-    } catch (error) {
-      console.error("Recording error:", error);
-      toast({
-        title: "Microphone error",
-        description: "Could not access your microphone. Please check permissions.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-    }
-  };
-
-  const convertToSpeech = async (text: string) => {
-    try {
-      setIsSpeaking(true);
-      console.log("Sending text to eleven-labs-voice:", text.substring(0, 30) + "...");
-      
-      const { data, error } = await supabase.functions.invoke("eleven-labs-voice", {
-        body: { 
-          message: text,
-          voice_id: "EXAVITQu4vr4xnSDxMaL" 
-        }
-      });
-      
-      if (error) {
-        console.error("Eleven Labs error:", error);
-        throw new Error("Failed to convert text to speech");
-      }
-      
-      if (!data || !data.audio) {
-        console.error("No audio data received from Eleven Labs");
-        throw new Error("No audio data received");
-      }
-      
-      const audioContent = data.audio;
-      console.log("Audio received, length:", audioContent.length);
-      
-      const audio = new Audio(`data:audio/mpeg;base64,${audioContent}`);
-      audio.onended = () => setIsSpeaking(false);
-      audio.onerror = (e) => {
-        console.error("Audio playback error:", e);
-        setIsSpeaking(false);
-      };
-      await audio.play();
-    } catch (error) {
-      console.error("Text-to-speech error:", error);
-      toast({
-        title: "Voice error",
-        description: "Could not convert text to speech. Using text only.",
-        variant: "destructive"
-      });
-      setIsSpeaking(false);
     }
   };
 
@@ -512,73 +366,12 @@ const Dashboard = () => {
               <CardDescription>Your AI health assistant</CardDescription>
             </CardHeader>
             
-            <CardContent className="flex-grow overflow-y-auto pt-4">
-              <div className="space-y-4">
-                {messages.map((message) => (
-                  <div 
-                    key={message.id} 
-                    className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div 
-                      className={`max-w-[80%] p-3 rounded-lg ${
-                        message.sender === 'user' 
-                          ? 'bg-[#301A4B] text-white rounded-tr-none' 
-                          : 'bg-gray-100 text-gray-800 rounded-tl-none'
-                      }`}
-                    >
-                      <p>{message.text}</p>
-                      <p className={`text-xs mt-1 ${message.sender === 'user' ? 'text-white/70' : 'text-gray-500'}`}>
-                        {message.time}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-                <div ref={messagesEndRef} />
+            <CardContent className="flex-grow overflow-y-auto pt-4 relative">
+              {/* Eleven Labs Conversation Widget */}
+              <div className="w-full h-full flex items-center justify-center">
+                <elevenlabs-convai agent-id="kVWRcvZrI3hlHgA90ED7"></elevenlabs-convai>
               </div>
             </CardContent>
-            
-            <CardFooter className="border-t p-3">
-              <form onSubmit={handleSendMessage} className="w-full flex gap-2">
-                <div className="relative flex-grow">
-                  <input
-                    type="text"
-                    placeholder={isListening ? "Listening..." : "Type your message..."}
-                    className="w-full p-3 pr-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#CB48B7] focus:border-transparent"
-                    value={userInput}
-                    onChange={(e) => setUserInput(e.target.value)}
-                    disabled={isRecording || isAIProcessing}
-                  />
-                  <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                </div>
-                
-                <Button 
-                  type="button" 
-                  variant="outline"
-                  onClick={toggleVoiceConversation}
-                  className={`${
-                    isRecording 
-                      ? 'bg-red-100 text-red-600 border-red-300' 
-                      : isSpeaking 
-                        ? 'bg-purple-100 text-purple-600 border-purple-300'
-                        : ''
-                  } relative`}
-                  disabled={isAIProcessing}
-                >
-                  <MicrophoneWithWaves 
-                    isRecording={isRecording} 
-                    isSpeaking={isSpeaking} 
-                  />
-                </Button>
-                
-                <Button 
-                  type="submit" 
-                  className="bg-[#301A4B] hover:bg-[#301A4B]/90"
-                  disabled={isRecording || isAIProcessing || isSpeaking || (!userInput.trim() && !isRecording)}
-                >
-                  Send
-                </Button>
-              </form>
-            </CardFooter>
           </Card>
         </div>
       </div>
