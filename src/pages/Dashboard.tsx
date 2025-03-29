@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -34,9 +35,9 @@ import AppointmentManager from "@/components/AppointmentManager";
 import { supabase } from "@/integrations/supabase/client";
 import MicrophoneWithWaves from "@/components/MicrophoneWithWaves";
 import DoctorDetail from "@/components/DoctorDetail";
+import MedicationsPanel from "@/components/MedicationsPanel";
 
 const userData = {
-  name: "John Doe",
   upcomingAppointments: [
     { 
       id: 1, 
@@ -70,10 +71,22 @@ const userData = {
       patientCase: "Follow-up on recent skin rash and evaluation of treatment effectiveness."
     }
   ],
+  pastAppointments: [
+    {
+      id: 4,
+      doctor: "Dr. James Wilson",
+      specialty: "Orthopedic Surgeon",
+      date: "April 28, 2023",
+      time: "3:45 PM",
+      appointmentType: "in-person",
+      location: "City Medical Center",
+      notes: "Discussed recovery progress after knee surgery. Physical therapy to continue for 6 more weeks."
+    }
+  ],
   medications: [
-    { id: 1, name: "Lisinopril", dosage: "10mg", frequency: "Once daily", time: "8:00 AM", nextDose: "Today" },
-    { id: 2, name: "Metformin", dosage: "500mg", frequency: "Twice daily", time: "8:00 AM / 8:00 PM", nextDose: "Today" },
-    { id: 3, name: "Atorvastatin", dosage: "20mg", frequency: "Once daily", time: "8:00 PM", nextDose: "Today" }
+    { id: 1, name: "Lisinopril", dosage: "10mg", frequency: "Once daily", time: "8:00 AM", nextDose: "Today", remaining: 14, refillDate: "June 15, 2023" },
+    { id: 2, name: "Metformin", dosage: "500mg", frequency: "Twice daily", time: "8:00 AM / 8:00 PM", nextDose: "Today", remaining: 23, refillDate: "June 25, 2023" },
+    { id: 3, name: "Atorvastatin", dosage: "20mg", frequency: "Once daily", time: "8:00 PM", nextDose: "Today", remaining: 7, refillDate: "June 5, 2023" }
   ]
 };
 
@@ -89,7 +102,7 @@ const formatTime = () => {
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const [activeChat, setActiveChat] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [messages, setMessages] = useState([
@@ -99,10 +112,26 @@ const Dashboard = () => {
   const [showSymptomChecker, setShowSymptomChecker] = useState(false);
   const [showAppointmentManager, setShowAppointmentManager] = useState(false);
   const [appointments, setAppointments] = useState(userData.upcomingAppointments);
+  const [pastAppointments, setPastAppointments] = useState(userData.pastAppointments);
   const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
   const [showDoctorDetail, setShowDoctorDetail] = useState(false);
+  const [showMedications, setShowMedications] = useState(false);
+  const [medications, setMedications] = useState(userData.medications);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Get user's first name from metadata or email
+  const getUserFirstName = () => {
+    if (user) {
+      if (user.user_metadata && user.user_metadata.first_name) {
+        return user.user_metadata.first_name;
+      } else if (user.email) {
+        // Use the part before @ in email as a fallback
+        return user.email.split('@')[0];
+      }
+    }
+    return "there"; // Generic fallback
+  };
 
   const handleLogout = async () => {
     try {
@@ -181,6 +210,10 @@ const Dashboard = () => {
     setShowDoctorDetail(true);
   };
 
+  const openMedicationsPanel = () => {
+    setShowMedications(true);
+  };
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -202,7 +235,7 @@ const Dashboard = () => {
               <LogOut className="h-5 w-5" />
             </Button>
             <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center text-sm font-medium">
-              JD
+              {getUserFirstName().charAt(0).toUpperCase()}
             </div>
           </div>
         </div>
@@ -212,7 +245,7 @@ const Dashboard = () => {
         <div className="lg:col-span-1 space-y-6">
           <Card className="animate-fade-in">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl">Welcome back, {userData.name}</CardTitle>
+              <CardTitle className="text-xl">Welcome back, {getUserFirstName()}</CardTitle>
               <CardDescription>Here's your health summary</CardDescription>
             </CardHeader>
             
@@ -230,7 +263,15 @@ const Dashboard = () => {
                   <Clock className="h-5 w-5 text-[#CB48B7]" />
                   <div>
                     <p className="text-sm font-medium">Medication reminder</p>
-                    <p className="text-xs text-gray-500">Next: {userData.medications[0].name} at {userData.medications[0].time}</p>
+                    <p className="text-xs text-gray-500">Next: {medications[0].name} at {medications[0].time}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-3 bg-[#CB48B7]/10 rounded-lg">
+                  <Calendar className="h-5 w-5 text-[#CB48B7]" />
+                  <div>
+                    <p className="text-sm font-medium">Last appointment</p>
+                    <p className="text-xs text-gray-500">{pastAppointments[0]?.date} with {pastAppointments[0]?.doctor}</p>
                   </div>
                 </div>
               </div>
@@ -265,6 +306,7 @@ const Dashboard = () => {
                 <Button 
                   variant="outline" 
                   className="h-auto flex-col items-center justify-center py-6 hover:bg-[#CB48B7]/10 hover:text-[#301A4B] hover:border-[#CB48B7]"
+                  onClick={openMedicationsPanel}
                 >
                   <Pill className="h-6 w-6 mb-2" />
                   <span className="text-sm">My Medications</span>
@@ -366,10 +408,9 @@ const Dashboard = () => {
               <CardDescription>Your AI health assistant</CardDescription>
             </CardHeader>
             
-            <CardContent className="flex-grow overflow-y-auto pt-4 relative">
-              {/* Eleven Labs Conversation Widget */}
+            <CardContent className="flex-grow overflow-y-auto pt-4 relative flex items-center justify-center">
               <div className="w-full h-full flex items-center justify-center">
-                <elevenlabs-convai agent-id="kVWRcvZrI3hlHgA90ED7"></elevenlabs-convai>
+                <elevenlabs-convai agent-id="kVWRcvZrI3hlHgA90ED7" style={{ width: '100%', height: '100%', minHeight: '500px' }}></elevenlabs-convai>
               </div>
             </CardContent>
           </Card>
@@ -394,6 +435,12 @@ const Dashboard = () => {
           doctor={selectedDoctor}
         />
       )}
+
+      <MedicationsPanel
+        open={showMedications}
+        onOpenChange={setShowMedications}
+        medications={medications}
+      />
     </div>
   );
 };
