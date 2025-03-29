@@ -273,7 +273,10 @@ const Dashboard = () => {
       console.log("Sending text to eleven-labs-voice:", text.substring(0, 30) + "...");
       
       const { data, error } = await supabase.functions.invoke("eleven-labs-voice", {
-        body: { message: text, voice_id: "kVWRcvZrI3hlHgA90ED7" }
+        body: { 
+          message: text,
+          voice_id: "EXAVITQu4vr4xnSDxMaL" 
+        }
       });
       
       if (error) {

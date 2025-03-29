@@ -24,8 +24,9 @@ serve(async (req) => {
       throw new Error('Missing Eleven Labs API key')
     }
 
-    // Default voice ID from user or use default
-    const voiceId = voice_id || 'kVWRcvZrI3hlHgA90ED7'
+    // Use a default voice ID from the standard Eleven Labs voices
+    // Use Bella as default (female voice)
+    const voiceId = voice_id || 'EXAVITQu4vr4xnSDxMaL'
 
     console.log(`Converting text to speech with Eleven Labs, voice ID: ${voiceId}`)
     console.log(`Text sample: ${message.substring(0, 50)}${message.length > 50 ? '...' : ''}`)
