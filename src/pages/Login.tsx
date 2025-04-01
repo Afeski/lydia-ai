@@ -155,7 +155,7 @@ const Login = ({ onLoginSuccess = () => {} }) => {
                       <div className="relative">
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 h-5 w-5" />
                         <Input 
-                          placeholder="john.doe@example.com" 
+                          placeholder="" 
                           type="email" 
                           className="pl-10" 
                           {...field} 
@@ -185,7 +185,7 @@ const Login = ({ onLoginSuccess = () => {} }) => {
                       <div className="relative">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 h-5 w-5" />
                         <Input 
-                          placeholder="********" 
+                          placeholder="" 
                           type="password" 
                           className="pl-10" 
                           {...field} 

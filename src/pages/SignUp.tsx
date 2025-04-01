@@ -62,7 +62,16 @@ const SignUp = ({ onSignUpSuccess = () => {} }) => {
 
   async function onSubmit(data: SignUpFormValues) {
     try {
-      const { error } = await signUp(data.email, data.password);
+      // Store first_name in user metadata to use in the welcome message
+      const options = {
+        data: {
+          first_name: data.firstName,
+          last_name: data.lastName,
+          phone: data.phone
+        }
+      };
+      
+      const { error } = await signUp(data.email, data.password, options);
       
       if (error) {
         console.error("Signup error:", error);
@@ -174,7 +183,7 @@ const SignUp = ({ onSignUpSuccess = () => {} }) => {
                         <div className="relative">
                           <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 h-5 w-5" />
                           <Input 
-                            placeholder="John" 
+                            placeholder="" 
                             className="pl-10" 
                             {...field} 
                           />
@@ -195,7 +204,7 @@ const SignUp = ({ onSignUpSuccess = () => {} }) => {
                         <div className="relative">
                           <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 h-5 w-5" />
                           <Input 
-                            placeholder="Doe" 
+                            placeholder="" 
                             className="pl-10" 
                             {...field} 
                           />
@@ -217,7 +226,7 @@ const SignUp = ({ onSignUpSuccess = () => {} }) => {
                       <div className="relative">
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 h-5 w-5" />
                         <Input 
-                          placeholder="john.doe@example.com" 
+                          placeholder="" 
                           type="email" 
                           className="pl-10" 
                           {...field} 
@@ -239,7 +248,7 @@ const SignUp = ({ onSignUpSuccess = () => {} }) => {
                       <div className="relative">
                         <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 h-5 w-5" />
                         <Input 
-                          placeholder="(123) 456-7890" 
+                          placeholder="" 
                           className="pl-10" 
                           {...field} 
                         />
@@ -260,7 +269,7 @@ const SignUp = ({ onSignUpSuccess = () => {} }) => {
                       <div className="relative">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 h-5 w-5" />
                         <Input 
-                          placeholder="********" 
+                          placeholder="" 
                           type="password" 
                           className="pl-10" 
                           {...field} 

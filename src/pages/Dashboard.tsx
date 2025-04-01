@@ -80,7 +80,9 @@ const userData = {
       time: "3:45 PM",
       appointmentType: "in-person",
       location: "City Medical Center",
-      notes: "Discussed recovery progress after knee surgery. Physical therapy to continue for 6 more weeks."
+      notes: "Discussed recovery progress after knee surgery. Physical therapy to continue for 6 more weeks.",
+      bio: "Dr. James Wilson is an orthopedic surgeon specializing in sports medicine and joint replacement. He has performed over 1,000 successful surgeries and is known for his minimally invasive techniques.",
+      patientCase: "Post-operative follow-up for knee arthroscopy performed 4 weeks ago."
     }
   ],
   medications: [
@@ -117,6 +119,7 @@ const Dashboard = () => {
   const [showDoctorDetail, setShowDoctorDetail] = useState(false);
   const [showMedications, setShowMedications] = useState(false);
   const [medications, setMedications] = useState(userData.medications);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -126,11 +129,11 @@ const Dashboard = () => {
       if (user.user_metadata && user.user_metadata.first_name) {
         return user.user_metadata.first_name;
       } else if (user.email) {
-        // Use the part before @ in email as a fallback
+        // Use the part before @ in email as a fallback (only if no first_name in metadata)
         return user.email.split('@')[0];
       }
     }
-    return "there"; // Generic fallback
+    return ""; // Empty fallback rather than "there"
   };
 
   const handleLogout = async () => {
@@ -218,6 +221,12 @@ const Dashboard = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const handleViewLastAppointment = () => {
+    if (pastAppointments && pastAppointments.length > 0) {
+      openDoctorDetail(pastAppointments[0]);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-[#301A4B] text-white">
@@ -245,7 +254,7 @@ const Dashboard = () => {
         <div className="lg:col-span-1 space-y-6">
           <Card className="animate-fade-in">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl">Welcome back, {getUserFirstName()}</CardTitle>
+              <CardTitle className="text-xl">Welcome back{getUserFirstName() ? `, ${getUserFirstName()}` : ''}</CardTitle>
               <CardDescription>Here's your health summary</CardDescription>
             </CardHeader>
             
@@ -267,13 +276,17 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-3 bg-[#CB48B7]/10 rounded-lg">
+                <button 
+                  className="flex items-center gap-3 p-3 w-full bg-[#CB48B7]/10 rounded-lg hover:bg-[#CB48B7]/20 transition-all text-left"
+                  onClick={handleViewLastAppointment}
+                >
                   <Calendar className="h-5 w-5 text-[#CB48B7]" />
                   <div>
                     <p className="text-sm font-medium">Last appointment</p>
                     <p className="text-xs text-gray-500">{pastAppointments[0]?.date} with {pastAppointments[0]?.doctor}</p>
                   </div>
-                </div>
+                  <ChevronRight className="ml-auto h-4 w-4 text-gray-400" />
+                </button>
               </div>
             </CardContent>
           </Card>
@@ -409,8 +422,11 @@ const Dashboard = () => {
             </CardHeader>
             
             <CardContent className="flex-grow overflow-y-auto pt-4 relative flex items-center justify-center">
-              <div className="w-full h-full flex items-center justify-center">
-                <elevenlabs-convai agent-id="kVWRcvZrI3hlHgA90ED7" style={{ width: '100%', height: '100%', minHeight: '500px' }}></elevenlabs-convai>
+              <div className="w-full h-full flex flex-col items-center justify-center">
+                <div className="mb-8">
+                  <MicrophoneWithWaves isRecording={false} isSpeaking={isSpeaking} size="large" />
+                </div>
+                <elevenlabs-convai agent-id="kVWRcvZrI3hlHgA90ED7" style={{ width: '100%', height: '400px', minHeight: '400px' }}></elevenlabs-convai>
               </div>
             </CardContent>
           </Card>
